@@ -1,10 +1,20 @@
 from PySimLib import *;
 
-mdl = CreateModel("pendel", "pendel.mo");
-tool = mdl.GetCompatibleTools()[0];
-solver = tool.GetDefaultSolver();
+Log.SetTarget(open("sim.log", "w"));
 
-print(mdl);
-print(tool);
-print(solver);
-print(tool.GetCompatibleSolvers());
+mdl = Model("pendulum", "pendulum.mo");
+mdl.outputDir += "/result";
+mdl.parameters["L"] = 2;
+
+tool = mdl.GetCompatibleTools()[0];
+tool.Compile(mdl);
+
+sim = tool.CreateSimulation(mdl);
+tool.Simulate(sim);
+
+result = tool.ReadResult(sim);
+
+
+p = Plot();
+p.Add(result["time"], result["derPhi"], "r");
+p.Show();

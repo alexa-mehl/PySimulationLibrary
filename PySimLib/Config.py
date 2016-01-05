@@ -2,7 +2,9 @@ from PySimLib.Platform import *;
 
 #Public
 def GetConfigValue(section, key):
-	pass
+	global __g_sections;
+	
+	return __g_sections[section][key];
 	
 def HasConfigValue(section, key):
 	global __g_sections;
@@ -44,6 +46,6 @@ def ReadConfigFromFile():
 
 #read config
 if(GetPlatform() == Platform.Windows):
-	raise NotImplemented("TODO: read registry on windows");
+	raise NotImplementedError("TODO: read registry on windows");
 else:
 	ReadConfigFromFile();

@@ -19,5 +19,5 @@ setup(
     description="Python Simulation Library",
 
     # Packages
-    packages=["PySimLib", "PySimLib.Models", "PySimLib.Solvers", "PySimLib.Tools"],
+    packages=["PySimLib", "PySimLib.Exceptions", "PySimLib.Mat", "PySimLib.Models", "PySimLib.Solvers", "PySimLib.Tools"],
 )

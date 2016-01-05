@@ -1,41 +1,6 @@
-#Interface
-def CreateModel(name, files):
-	global __g_modelClasses;
-	
-	if(not (type(files) == list)):
-		files = [files];
-		
-	for mdlClass in __g_modelClasses:
-		if(mdlClass.Matches(name, files)):
-			return mdlClass(name, files);
-			
-			
-def FindSolver(pattern):
-	from PySimLib.Tool import Tool;
-	
-	solvers = GetSolvers();
-	pattern = pattern.lower();
-	for solver in solvers:
-		if(not (solver.GetName().lower().find(pattern) == -1)):
-			return solver;
-				
-	return None;
-			
-def GetSolvers():
-	global __g_solvers;
-	
-	result = [];
-	
-	for solver in __g_solvers:
-		result.append(__g_solvers[solver]());
-		
-	return result;
-			
-def GetTools():
-	global __g_tools;
-	
-	return __g_tools;
-	
+#Import what user might need
+from PySimLib import Log;
+from PySimLib.Plot import Plot;
 
 #Internal
 __g_tools = [];
@@ -66,8 +31,49 @@ def __RegisterSolvers():
 	#DASSL
 	from PySimLib.Solvers.DASSL import DASSL;
 	__g_solvers[DASSL()] = DASSL;
-    
-    
+	
+Model = None;
+
 __RegisterTools();
-__RegisterModelRepresentationClasses();
 __RegisterSolvers();
+__RegisterModelRepresentationClasses();
+
+
+#Interface
+def Model(name, files):
+	global __g_modelClasses;
+	
+	if(not (type(files) == list)):
+		files = [files];
+		
+	for mdlClass in __g_modelClasses:
+		if(mdlClass.Matches(name, files)):
+			return mdlClass(name, files);
+
+
+def FindSolver(pattern):
+	from PySimLib.Tool import Tool;
+	
+	solvers = GetSolvers();
+	for solver in solvers:
+		if(solver.Matches(pattern)):
+			return solver;
+				
+	return None;
+
+
+def GetSolvers():
+	global __g_solvers;
+	
+	result = [];
+	
+	for solver in __g_solvers:
+		result.append(__g_solvers[solver]());
+		
+	return result;
+
+		
+def GetTools():
+	global __g_tools;
+	
+	return __g_tools;	
