@@ -30,7 +30,10 @@ def __RegisterSolvers():
 	
 	#DASSL
 	from PySimLib.Solvers.DASSL import DASSL;
-	__g_solvers[DASSL()] = DASSL;
+	
+	#Euler
+	from PySimLib.Solvers.Euler import Euler;
+	__g_solvers[Euler()] = Euler;
 	
 Model = None;
 

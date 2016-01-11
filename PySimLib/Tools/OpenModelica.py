@@ -111,11 +111,17 @@ class OpenModelica(Tool):
 		for item in mdl.GetFiles():
 			mosfile.write("loadFile(\"" + item + "\");\r\n");
 			
+		#evaluate parameters #TODO looks like structural parameters cant be set in openmodelica
+		overrideString = "";
+		if(mdl.parameters):
+			overrideString = ', simflags="-override ';
+			for k in mdl.parameters:
+				overrideString += k + "=" + str(mdl.parameters[k]) + " ";
+			overrideString += '"';
+			
 		# do a dummy simulation since it is not yet possible to do a translation only
 		#mosfile.write("simulate(" + mdl.GetModelicaClassString() + ", startTime = " + str(0) + ", stopTime = " + str(1) + ", method = \"" + "dassl" + "\", outputFormat=\"mat\");\r\n");
-		mosfile.write("simulate(" + mdl.GetName() + ", startTime = " + str(0) + ", stopTime = " + str(1) + ", method = \"" + "dassl" + "\", outputFormat=\"mat\");\r\n");
-		for k in mdl.parameters:
-			mosfile.write("setInitXmlStartValue(\"" + mdl.GetName() + "_init.xml\", \"" + k + "\", \"" + str(mdl.parameters[k]) + "\", \"" + mdl.GetName() + "_init.xml\");\r\n");
+		mosfile.write("simulate(" + mdl.GetName() + ", startTime = " + str(0) + ", stopTime = " + str(1) + ", method = \"" + "dassl" + "\", outputFormat=\"mat\"" + overrideString + ");\r\n");
 		mosfile.close();
 		
 		#call the open modelica compiler
@@ -225,6 +231,7 @@ class OpenModelica(Tool):
 		solvers = [];
 		
 		solvers.append(FindSolver("dassl"));
+		solvers.append(FindSolver("euler"));
 		
 		return solvers;
 		
