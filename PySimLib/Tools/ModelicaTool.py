@@ -1,0 +1,55 @@
+#Global
+import os;
+#Local
+from PySimLib.Tool import Tool;
+
+class ModelicaTool(Tool):
+	#Public methods
+	def Accepts(this, mdl):
+		from PySimLib.Models.ModelicaModel import ModelicaModel;
+		
+		return isinstance(mdl, ModelicaModel);
+		
+	def GetDefaultSolver(this):
+		from PySimLib import FindSolver;
+		
+		return FindSolver("dassl");
+		
+	def ReadResult(this, sim):
+		from PySimLib.Mat.Mat import Mat;
+		
+		mdl = sim.GetModel();
+		
+		result = {};
+		m_res = Mat();
+		m_res.Load(mdl.outputDir + os.sep + mdl.outputName + "_res.mat");
+		
+		#dsres matrices are all transposed-.-
+		names = m_res.GetMatrix("name");
+		names.Transpose();
+		dataInfo = m_res.GetMatrix("dataInfo");
+		dataInfo.Transpose();
+		
+		for i in range(0, names.GetNumberOfStrings()):
+			if(i == 0 and dataInfo.GetValue(0, i) == 0):
+				dataMatrixIndex = 2; #hm... this is not necessarily the case... we need the biggest abscissa
+			else:
+				dataMatrixIndex = dataInfo.GetValue(0, i);
+			dataMatrix = m_res.GetMatrix("data_" + str(dataMatrixIndex));
+			k = dataInfo.GetValue(1, i);
+			col = abs(k)-1;
+			if(k > 0):
+				sign = 1;
+			else:
+				sign = -1;
+				
+			currentVar = [];
+			for j in range(0, dataMatrix.GetNumberOfColumns()):
+				currentVar.append(sign * dataMatrix.GetValue(j, col));
+			
+			if(names.GetString(i) == "Time"):
+				result["time"] = currentVar;
+			else:
+				result[names.GetString(i)] = currentVar;
+			
+		return result;

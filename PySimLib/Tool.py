@@ -28,6 +28,12 @@ class Tool:
 	#Abstract
 	def Accepts(this, mdl):
 		raise NotImplementedError("The method Tool::Accepts is abstract.");
+		
+	def Close(this):
+		raise NotImplementedError("The method Tool::Close is abstract.");
+		
+	def CreateSimulation(this, mdl):
+		raise NotImplementedError("The method Tool::CreateSimulation is abstract.");
 	
 	def GetCompatibleSolvers(this):
 		raise NotImplementedError("The method Tool::GetCompatibleSolvers is abstract.");
@@ -43,3 +49,7 @@ class Tool:
 		
 	def Simulate(this, sim):
 		raise NotImplementedError("The method Tool::Simulate is abstract.");
+		
+	#Abstract Functions
+	def IsAvailable():
+		raise NotImplementedError("The function Tool::IsAvailable is abstract.");

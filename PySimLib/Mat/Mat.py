@@ -120,6 +120,9 @@ class Mat:
 		this.__matrices[name] = m;
 		return m;
 		
+	def GetMatrices(this):
+		return this.__matrices;
+		
 	def GetMatrix(this, name):
 		return this.__matrices[name];
 		

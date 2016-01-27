@@ -4,7 +4,6 @@ Log.SetTarget(open("sim.log", "w"));
 
 mdl = Model("pendulum", "pendulum.mo");
 mdl.outputDir += "/result";
-mdl.parameters["L"] = 2;
 
 tool = mdl.GetCompatibleTools()[0];
 tool.Compile(mdl);
@@ -18,3 +17,6 @@ result = tool.ReadResult(sim);
 p = Plot();
 p.Add(result["time"], result["derPhi"], "r");
 p.Show();
+
+
+tool.Close();

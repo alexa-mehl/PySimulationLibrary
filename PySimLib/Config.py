@@ -1,6 +1,11 @@
 from PySimLib.Platform import *;
 
 #Public
+def GetBoolConfigValue(section, key):
+	global __g_sections;
+	
+	return __g_sections[section][key] == "true";
+	
 def GetConfigValue(section, key):
 	global __g_sections;
 	
@@ -27,7 +32,7 @@ def ReadConfigFromFile():
 	
 	global __g_sections;
 	
-	path = GetUserDirectory() + '/.config/PySimLib.cfg';
+	path = GetConfigDirectory() + '/PySimLib.cfg';
 	
 	if(not os.path.isfile(path)):
 		raise Exception("PySimLib is not configured. Please read the manual to do so.");
@@ -45,7 +50,4 @@ def ReadConfigFromFile():
 			__g_sections[section] = entries;
 
 #read config
-if(GetPlatform() == Platform.Windows):
-	raise NotImplementedError("TODO: read registry on windows");
-else:
-	ReadConfigFromFile();
+ReadConfigFromFile();

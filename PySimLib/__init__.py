@@ -15,9 +15,13 @@ def __RegisterTool(toolClass):
 
 def __RegisterTools():
 	#OpenModelica
-    from PySimLib.Tools.OpenModelica import OpenModelica;
-    __RegisterTool(OpenModelica);
-    
+	from PySimLib.Tools.OpenModelica import OpenModelica;
+	__RegisterTool(OpenModelica);
+	
+	#Dymola
+	from PySimLib.Tools.Dymola import Dymola;
+	__RegisterTool(Dymola);
+	
 def __RegisterModelRepresentationClasses():
 	global __g_modelClasses;
 	
@@ -28,12 +32,17 @@ def __RegisterModelRepresentationClasses():
 def __RegisterSolvers():
 	global __g_solvers;
 	
+	#DEABM
+	from PySimLib.Solvers.DEABM import DEABM;
+	__g_solvers[DEABM()] = DEABM;
+	
 	#DASSL
 	from PySimLib.Solvers.DASSL import DASSL;
+	__g_solvers[DASSL()] = DASSL;
 	
-	#Euler
-	from PySimLib.Solvers.Euler import Euler;
-	__g_solvers[Euler()] = Euler;
+	#Euler #TODO: REENABLE ME!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	#from PySimLib.Solvers.Euler import Euler;
+	#__g_solvers[Euler()] = Euler;
 	
 Model = None;
 
@@ -62,6 +71,16 @@ def FindSolver(pattern):
 		if(solver.Matches(pattern)):
 			return solver;
 				
+	return None;
+	
+def FindTool(pattern):
+	tools = GetTools();
+	
+	pattern = pattern.lower();	
+	for tool in tools:
+		if(tool.GetName().lower() == pattern):
+			return tool;
+			
 	return None;
 
 

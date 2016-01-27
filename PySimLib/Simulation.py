@@ -19,8 +19,8 @@ class Simulation:
 	#Magic methods
 	def __str__(this):
 		result = "Simulation(";
-		result += "startTime: " + this.startTime + ", ";
-		result += "stopTime: " + this.stopTime + ", ";
+		result += "startTime: " + str(this.startTime) + ", ";
+		result += "stopTime: " + str(this.stopTime) + ", ";
 		result += "solver: " + str(this.solver) + ", ";
 		result += "vars: {";
 		for var in this.vars:
