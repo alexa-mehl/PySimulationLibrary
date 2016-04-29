@@ -18,17 +18,17 @@ class OpenModelica(ModelicaTool):
 			return None;
 		
 		for node in var.childNodes: #find the value
-			if(node.nodeType == xml.dom.Node.ELEMENT_NODE):
-				if(node.getAttribute("useStart") == "false"):
-					return None;
-					
+			if(node.nodeType == xml.dom.Node.ELEMENT_NODE):					
 				varDesc = VariableDescriptor();
-					
-				start = node.getAttribute("start");
-				if(start == ""):
-					varDesc.start = 0;
+				
+				if(node.getAttribute("useStart") == "true"):
+					start = node.getAttribute("start");
+					if(start == ""):
+						varDesc.start = 0;
+					else:
+						varDesc.start = float(start);
 				else:
-					varDesc.start = float(start);
+					varDesc.start = None;
 				
 				return varName, varDesc;
 				
@@ -84,9 +84,12 @@ class OpenModelica(ModelicaTool):
 					
 				for node in var.childNodes: #find the value
 					if(node.nodeType == xml.dom.Node.ELEMENT_NODE):
-						#node.setAttribute("useStart", "true");
+						if(sim.vars[varName].start is None):
+							node.setAttribute("useStart", "false");
+						else:
+							node.setAttribute("useStart", "true");
+							node.setAttribute("start", str(sim.vars[varName].start));
 						#node.setAttribute("fixed", "true");
-						node.setAttribute("start", str(sim.vars[varName].start));
 						break;
 						
 		this._DeleteFile(outputFilePath);
@@ -173,6 +176,8 @@ class OpenModelica(ModelicaTool):
 		this._DeleteFile(mdl.GetName() + "_14lnz.o");
 		this._DeleteFile(mdl.GetName() + "_15syn.c");
 		this._DeleteFile(mdl.GetName() + "_15syn.o");
+		this._DeleteFile(mdl.GetName() + "_16dae.c");
+		this._DeleteFile(mdl.GetName() + "_16dae.o");
 		this._DeleteFile(mdl.GetName() + "_functions.c");
 		this._DeleteFile(mdl.GetName() + "_functions.h");
 		this._DeleteFile(mdl.GetName() + "_functions.o");
