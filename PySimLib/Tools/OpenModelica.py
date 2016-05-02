@@ -34,6 +34,16 @@ class OpenModelica(ModelicaTool):
 				
 		return None;
 		
+	def __GetInitFileXML(this, mdl):
+		from PySimLib.Exceptions.UncompiledModelException import UncompiledModelException;
+		
+		path = mdl.simDir + os.sep + mdl.outputName + "_init.xml";
+		
+		if(not this._FileExists(path)):
+			raise UncompiledModelException(mdl, this);
+			
+		return xml.dom.minidom.parse(path);
+		
 	def __GetSolverString(this, solver):
 		if(solver.Matches("dassl")):
 			return "dassl";
@@ -89,7 +99,7 @@ class OpenModelica(ModelicaTool):
 						else:
 							node.setAttribute("useStart", "true");
 							node.setAttribute("start", str(sim.vars[varName].start));
-						#node.setAttribute("fixed", "true");
+							#node.setAttribute("fixed", "true");
 						break;
 						
 		this._DeleteFile(outputFilePath);
@@ -193,17 +203,24 @@ class OpenModelica(ModelicaTool):
 		this._RenameFile(mdl.GetName() + "_init.xml", mdl.simDir + os.sep + mdl.outputName + "_init.xml");
 		this._RenameFile(mdl.GetName() + "_info.json", mdl.simDir + os.sep + mdl.outputName + "_info.json");
 		
+		#read in parameters
+		initDom = this.__GetInitFileXML(mdl);
+		mv = initDom.getElementsByTagName("ModelVariables")[0];
+		
+		#read variables			
+		classTypeFilter = {
+		"rPar" #parameters
+		};
+		
+		parameters = this.__ReadVarsFromXML(mv, classTypeFilter);
+		for name in parameters:
+			mdl.parameters[name] = parameters[name].start;
+		
 	def CreateSimulation(this, mdl):
 		from PySimLib.Simulation import Simulation;
 		from PySimLib import FindSolver;
-		from PySimLib.Exceptions.UncompiledModelException import UncompiledModelException;
 		
-		initFilePath = mdl.simDir + os.sep + mdl.outputName + "_init.xml";
-		
-		if(not this._FileExists(initFilePath)):
-			raise UncompiledModelException(mdl, this);
-			
-		initDom = xml.dom.minidom.parse(initFilePath);
+		initDom = this.__GetInitFileXML(mdl);
 		mv = initDom.getElementsByTagName("ModelVariables")[0];
 		de = initDom.getElementsByTagName("DefaultExperiment")[0];
 		

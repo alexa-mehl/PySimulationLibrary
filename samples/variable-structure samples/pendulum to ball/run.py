@@ -5,7 +5,7 @@ Log.SetTarget(open("sim.log", "w"));
 
 #setup models and tool and then compile
 pendulum = Model("pendulum", "pendulum.mo");
-ball = Model("ball", "ball.mo");			
+ball = Model("ball", "ball.mo");
 
 tool = pendulum.GetCompatibleTools()[0];
 tool.Compile(pendulum);
@@ -18,7 +18,7 @@ derPhi = 0;
 index = None;
 
 while index is None:
-	derPhi += 1;
+	derPhi += 0.5;
 	
 	sim.vars["derPhi"].start = derPhi;
 	tool.Simulate(sim);
@@ -44,8 +44,11 @@ for i in range(0, index):
 #run ball sim
 sim = tool.CreateSimulation(ball);
 
+sim.stopTime = 0.6;
 sim.vars["x"].start = sin(result["phi"][index]);
 sim.vars["y"].start = -cos(result["phi"][index]);
+sim.vars["vx"].start = sin(result["phi"][index]) * result["derPhi"][index] * pendulum.parameters["L"];
+sim.vars["vy"].start = -cos(result["phi"][index]) * result["derPhi"][index] * pendulum.parameters["L"];
 
 tool.Simulate(sim);
 result2 = tool.ReadResult(sim);
