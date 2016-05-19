@@ -18,7 +18,7 @@ derPhi = 0;
 index = None;
 
 while index is None:
-	derPhi += 0.5;
+	derPhi += 1;
 	
 	sim.vars["derPhi"].start = derPhi;
 	tool.Simulate(sim);
@@ -49,8 +49,6 @@ sim.vars["x"].start = sin(result["phi"][index]);
 sim.vars["y"].start = -cos(result["phi"][index]);
 sim.vars["vx"].start = cos(result["phi"][index]) * result["derPhi"][index] * pendulum.parameters["L"];
 sim.vars["vy"].start = sin(result["phi"][index]) * result["derPhi"][index] * pendulum.parameters["L"];
-
-print(sim);
 
 tool.Simulate(sim);
 result2 = tool.ReadResult(sim);
