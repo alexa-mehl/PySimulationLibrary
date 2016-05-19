@@ -9,10 +9,12 @@ class Model:
 		#Public members
 		this.outputName = name;
 		this.outputDir = None;
+		this.resultDir = None;
 		this.simDir = None;
 		
 		if(len(files) == 1):
 			this.outputDir = os.path.abspath(os.path.dirname(files[0]));
+			this.resultDir = this.outputDir;
 			this.simDir = this.outputDir;
 			
 	#Public methods

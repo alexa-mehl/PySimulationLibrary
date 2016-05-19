@@ -7,6 +7,8 @@ mdl.outputDir += "/result";
 
 tool = mdl.GetCompatibleTools()[0];
 tool.Compile(mdl);
+exit();
+tool.ReadInit(mdl);
 
 sim = tool.CreateSimulation(mdl);
 tool.Simulate(sim);

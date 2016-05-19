@@ -9,6 +9,12 @@ from PySimLib.Tools.ModelicaTool import ModelicaTool;
 
 class OpenModelica(ModelicaTool):
 	#Private methods
+	def __AssertModelCompiled(this, mdl):
+		from PySimLib.Exceptions.UncompiledModelException import UncompiledModelException;
+		
+		if(not this._FileExists(this.__GetInitFilePath(mdl))):
+			raise UncompiledModelException(mdl, this);
+		
 	def __FindValueFromXMLVar(this, var):
 		from PySimLib.VariableDescriptor import VariableDescriptor;
 		store = False;
@@ -34,15 +40,16 @@ class OpenModelica(ModelicaTool):
 				
 		return None;
 		
-	def __GetInitFileXML(this, mdl):
-		from PySimLib.Exceptions.UncompiledModelException import UncompiledModelException;
+	def __GetExeFilePath(this, mdl):
+		return mdl.outputDir + os.sep + mdl.outputName + Platform.GetExeFileExtension();
 		
-		path = mdl.simDir + os.sep + mdl.outputName + "_init.xml";
+	def __GetInitFilePath(this, mdl):
+		return mdl.outputDir + os.sep + mdl.outputName + "_init.xml";
 		
-		if(not this._FileExists(path)):
-			raise UncompiledModelException(mdl, this);
+	def __GetInitFileXML(this, mdl):		
+		this.__AssertModelCompiled(mdl);
 			
-		return xml.dom.minidom.parse(path);
+		return xml.dom.minidom.parse(this.__GetInitFilePath(mdl));
 		
 	def __GetSolverString(this, solver):
 		if(solver.Matches("dassl")):
@@ -67,10 +74,9 @@ class OpenModelica(ModelicaTool):
 	def __WriteInit(this, sim):
 		mdl = sim.GetModel();
 		
-		initFilePath = mdl.simDir + os.sep + mdl.outputName + "_init.xml";
 		outputFilePath = mdl.simDir + os.sep + str(sim.GetSimNumber()) + ".xml";
 		
-		initDom = xml.dom.minidom.parse(initFilePath);
+		initDom = xml.dom.minidom.parse(this.__GetInitFileXML(mdl));
 		mv = initDom.getElementsByTagName("ModelVariables")[0];
 		de = initDom.getElementsByTagName("DefaultExperiment")[0];
 		
@@ -146,6 +152,10 @@ class OpenModelica(ModelicaTool):
 		this._DeleteFile(SCRIPTNAME); #we don't need the mos script anymore
 		if(not this._FileExists(mdl.GetName() + Platform.GetExeFileExtension())): #if simulation failed there will be no exe
 			raise CompilationFailedException(mdl, this);
+			
+		#make sure output folder exists
+		if(not this._DirExists(mdl.outputDir)):
+			os.makedirs(mdl.outputDir);
 		
 		#Remove unnecessary files		
 		this._DeleteFile(mdl.GetName() + ".c");
@@ -199,22 +209,9 @@ class OpenModelica(ModelicaTool):
 		this._DeleteFile(mdl.GetName() + "_res.mat");
 		
 		#Rename important files
-		this._RenameFile(mdl.GetName() + Platform.GetExeFileExtension(), mdl.simDir + os.sep + mdl.outputName + Platform.GetExeFileExtension());
-		this._RenameFile(mdl.GetName() + "_init.xml", mdl.simDir + os.sep + mdl.outputName + "_init.xml");
-		this._RenameFile(mdl.GetName() + "_info.json", mdl.simDir + os.sep + mdl.outputName + "_info.json");
-		
-		#read in parameters
-		initDom = this.__GetInitFileXML(mdl);
-		mv = initDom.getElementsByTagName("ModelVariables")[0];
-		
-		#read variables			
-		classTypeFilter = {
-		"rPar" #parameters
-		};
-		
-		parameters = this.__ReadVarsFromXML(mv, classTypeFilter);
-		for name in parameters:
-			mdl.parameters[name] = parameters[name].start;
+		this._RenameFile(mdl.GetName() + Platform.GetExeFileExtension(), mdl.outputDir + os.sep + mdl.outputName + Platform.GetExeFileExtension());
+		this._RenameFile(mdl.GetName() + "_init.xml", mdl.outputDir + os.sep + mdl.outputName + "_init.xml");
+		this._RenameFile(mdl.GetName() + "_info.json", mdl.outputDir + os.sep + mdl.outputName + "_info.json");
 		
 	def CreateSimulation(this, mdl):
 		from PySimLib.Simulation import Simulation;
@@ -255,6 +252,20 @@ class OpenModelica(ModelicaTool):
 	def GetName(this):
 		return "OpenModelica";
 		
+	def ReadInit(this, mdl):		
+		#read in parameters
+		initDom = this.__GetInitFileXML(mdl);
+		mv = initDom.getElementsByTagName("ModelVariables")[0];
+		
+		#read variables			
+		classTypeFilter = {
+			"rPar" #parameters
+		};
+		
+		parameters = this.__ReadVarsFromXML(mv, classTypeFilter);
+		for name in parameters:
+			mdl.parameters[name] = parameters[name].start;
+		
 	def Simulate(this, sim):
 		from PySimLib.Exceptions.SimulationFailedException import SimulationFailedException;
 		from PySimLib.Exceptions.UncompiledModelException import UncompiledModelException;
@@ -271,8 +282,8 @@ class OpenModelica(ModelicaTool):
 			raise UncompiledModelException(mdl, this);
 		
 		#make sure result folder exists
-		if(not this._DirExists(mdl.outputDir)):
-			os.makedirs(mdl.outputDir);
+		if(not this._DirExists(mdl.resultDir)):
+			os.makedirs(mdl.resultDir);
 		
 		#prepare init file		
 		this.__WriteInit(sim);
@@ -297,7 +308,7 @@ class OpenModelica(ModelicaTool):
 		this._DeleteFile(simInitFilePath);
 		
 		#rename results
-		this._RenameFile(mdl.GetName() + "_res.mat", mdl.outputDir + os.sep + mdl.outputName + "_res.mat");
+		this._RenameFile(mdl.GetName() + "_res.mat", mdl.resultDir + os.sep + mdl.outputName + "_res.mat");
 		
 	#Class functions
 	def IsAvailable():		

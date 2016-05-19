@@ -47,6 +47,9 @@ class Tool:
 	def Compile(this, mdl):
 		raise NotImplementedError("The method Tool::Compile is abstract.");
 		
+	def ReadInit(this, mdl):
+		raise NotImplementedError("The method Tool::ReadInit is abstract.");
+		
 	def Simulate(this, sim):
 		raise NotImplementedError("The method Tool::Simulate is abstract.");
 		
