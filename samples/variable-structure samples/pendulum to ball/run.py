@@ -37,8 +37,8 @@ x = [];
 y = [];
 for i in range(0, index):
 	v = result["phi"][i];
-	x.append(sin(v));
-	y.append(-cos(v));
+	x.append(sin(v) * pendulum.parameters["L"]);
+	y.append(-cos(v) * pendulum.parameters["L"]);
 			
 
 #run ball sim
@@ -47,8 +47,10 @@ sim = tool.CreateSimulation(ball);
 sim.stopTime = 0.6;
 sim.vars["x"].start = sin(result["phi"][index]);
 sim.vars["y"].start = -cos(result["phi"][index]);
-sim.vars["vx"].start = sin(result["phi"][index]) * result["derPhi"][index] * pendulum.parameters["L"];
-sim.vars["vy"].start = -cos(result["phi"][index]) * result["derPhi"][index] * pendulum.parameters["L"];
+sim.vars["vx"].start = cos(result["phi"][index]) * result["derPhi"][index] * pendulum.parameters["L"];
+sim.vars["vy"].start = sin(result["phi"][index]) * result["derPhi"][index] * pendulum.parameters["L"];
+
+print(sim);
 
 tool.Simulate(sim);
 result2 = tool.ReadResult(sim);
