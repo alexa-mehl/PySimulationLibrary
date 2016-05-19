@@ -4,6 +4,12 @@ import os;
 from PySimLib.Tool import Tool;
 
 class ModelicaTool(Tool):
+	#Protected methods
+	def _GetSimResultFilePath(this, sim):
+		mdl = sim.GetModel();
+		
+		return mdl.resultDir + os.sep + str(sim.GetSimNumber()) + "_" + mdl.outputName + ".mat";
+		
 	#Public methods
 	def Accepts(this, mdl):
 		from PySimLib.Models.ModelicaModel import ModelicaModel;
@@ -22,7 +28,7 @@ class ModelicaTool(Tool):
 		
 		result = {};
 		m_res = Mat();
-		m_res.Load(mdl.outputDir + os.sep + mdl.outputName + "_res.mat");
+		m_res.Load(this._GetSimResultFilePath(sim));
 		
 		#dsres matrices are all transposed-.-
 		names = m_res.GetMatrix("name");

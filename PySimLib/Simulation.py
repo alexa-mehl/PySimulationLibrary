@@ -4,6 +4,8 @@ class Simulation:
 	
 	#Constructor
 	def __init__(this, mdl):
+		import copy;
+		
 		#Private members
 		this.__mdl = mdl;
 		this.__simNumber = Simulation.__simCounter;
@@ -11,10 +13,10 @@ class Simulation:
 		Simulation.__simCounter += 1;
 		
 		#Public members
-		this.startTime = 0;
-		this.stopTime = 1;
-		this.solver = None;
-		this.vars = {};
+		this.startTime = mdl.startTime;
+		this.stopTime = mdl.stopTime;
+		this.solver = copy.deepcopy(mdl.solver);
+		this.variables = copy.deepcopy(mdl.variables);
 		
 	#Magic methods
 	def __str__(this):
@@ -23,8 +25,8 @@ class Simulation:
 		result += "stopTime: " + str(this.stopTime) + ", ";
 		result += "solver: " + str(this.solver) + ", ";
 		result += "vars: {";
-		for var in this.vars:
-			result += "(" + str(var) + ", " + str(this.vars[var]) + ")";
+		for var in this.variables:
+			result += "(" + str(var) + ", " + str(this.variables[var]) + ")";
 		result += "})";
 		
 		return result;

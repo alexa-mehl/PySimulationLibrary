@@ -31,9 +31,6 @@ class Tool:
 		
 	def Close(this):
 		raise NotImplementedError("The method Tool::Close is abstract.");
-		
-	def CreateSimulation(this, mdl):
-		raise NotImplementedError("The method Tool::CreateSimulation is abstract.");
 	
 	def GetCompatibleSolvers(this):
 		raise NotImplementedError("The method Tool::GetCompatibleSolvers is abstract.");

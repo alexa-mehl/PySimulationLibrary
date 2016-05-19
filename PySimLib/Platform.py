@@ -8,7 +8,7 @@ class Platform(Enum):
 	Linux = 2,
 
 #Interface functions
-def Execute(args, blocking = True):
+def Execute(args, blocking = True, workingDirectory = None):
 	import shlex;
 	from PySimLib import Log;
 	
@@ -17,10 +17,11 @@ def Execute(args, blocking = True):
 		arg = shlex.quote(arg);
 		
 	#execute
+	childProcess = subprocess.Popen(args, shell = False, stdout=Log.GetTarget(), stderr=Log.GetTarget(), cwd = workingDirectory);
 	if(blocking):
-		exitCode = subprocess.call(args, shell = False, stdout=Log.GetTarget(), stderr=Log.GetTarget());
+		childProcess.wait();
+		exitCode = childProcess.returncode;
 	else:
-		subprocess.Popen(args, shell = False, stdout=Log.GetTarget(), stderr=Log.GetTarget());
 		exitCode = None;
 		
 	#call program

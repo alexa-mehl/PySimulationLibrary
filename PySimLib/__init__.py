@@ -1,6 +1,7 @@
 #Import what user might need
 from PySimLib import Log;
 from PySimLib.Plot import Plot;
+from PySimLib.Simulation import Simulation;
 
 #Internal
 __g_tools = [];

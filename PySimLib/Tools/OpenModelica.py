@@ -43,6 +43,9 @@ class OpenModelica(ModelicaTool):
 	def __GetExeFilePath(this, mdl):
 		return mdl.outputDir + os.sep + mdl.outputName + Platform.GetExeFileExtension();
 		
+	def __GetInfoFilePath(this, mdl):
+		return mdl.outputDir + os.sep + mdl.outputName + "_info.json";
+		
 	def __GetInitFilePath(this, mdl):
 		return mdl.outputDir + os.sep + mdl.outputName + "_init.xml";
 		
@@ -50,6 +53,11 @@ class OpenModelica(ModelicaTool):
 		this.__AssertModelCompiled(mdl);
 			
 		return xml.dom.minidom.parse(this.__GetInitFilePath(mdl));
+		
+	def __GetSimInitFilePath(this, sim):
+		mdl = sim.GetModel();
+		
+		return mdl.simDir + os.sep + str(sim.GetSimNumber()) + ".xml";
 		
 	def __GetSolverString(this, solver):
 		if(solver.Matches("dassl")):
@@ -74,9 +82,7 @@ class OpenModelica(ModelicaTool):
 	def __WriteInit(this, sim):
 		mdl = sim.GetModel();
 		
-		outputFilePath = mdl.simDir + os.sep + str(sim.GetSimNumber()) + ".xml";
-		
-		initDom = xml.dom.minidom.parse(this.__GetInitFileXML(mdl));
+		initDom = this.__GetInitFileXML(mdl);
 		mv = initDom.getElementsByTagName("ModelVariables")[0];
 		de = initDom.getElementsByTagName("DefaultExperiment")[0];
 		
@@ -95,43 +101,50 @@ class OpenModelica(ModelicaTool):
 			if(var.nodeType == xml.dom.Node.ELEMENT_NODE):
 				varName = var.getAttribute("name");
 				
-				if(varName not in sim.vars):
+				if(varName not in sim.variables):
 					continue;
 					
 				for node in var.childNodes: #find the value
 					if(node.nodeType == xml.dom.Node.ELEMENT_NODE):
-						if(sim.vars[varName].start is None):
+						if(sim.variables[varName].start is None):
 							node.setAttribute("useStart", "false");
 						else:
 							node.setAttribute("useStart", "true");
-							node.setAttribute("start", str(sim.vars[varName].start));
+							node.setAttribute("start", str(sim.variables[varName].start));
 							#node.setAttribute("fixed", "true");
 						break;
 						
-		this._DeleteFile(outputFilePath);
-		file = open(outputFilePath, "w");
+		this._DeleteFile(this.__GetSimInitFilePath(sim));
+		file = open(this.__GetSimInitFilePath(sim), "w");
 		initDom.writexml(file);
 		file.close();
 		
-	#Public methods		
+	#Public methods
+	def Close(this):
+		#we don't use any open process
+		pass
+		
 	def Compile(this, mdl):
 		from PySimLib.Exceptions.CompilationFailedException import CompilationFailedException;
 		
 		#write a mos file to be executed by openmodelica
-		SCRIPTNAME = mdl.simDir + os.sep + mdl.GetName() + ".mos";
+		SCRIPTNAME = mdl.simDir + os.sep + mdl.outputName + ".mos";
 		mosfile = open(SCRIPTNAME, 'w', 1);
 		mosfile.write("loadModel(Modelica);\r\n");
 		
 		for item in mdl.GetFiles():
 			mosfile.write("loadFile(\"" + item + "\");\r\n");
 			
-		#evaluate parameters #TODO looks like structural parameters cant be set in openmodelica
+		#evaluate parameters
+		#TODO looks like structural parameters cant be set in openmodelica
 		overrideString = "";
+		"""
 		if(mdl.parameters):
 			overrideString = ', simflags="-override ';
 			for k in mdl.parameters:
 				overrideString += k + "=" + str(mdl.parameters[k]) + " ";
 			overrideString += '"';
+		"""
 			
 		# do a dummy simulation since it is not yet possible to do a translation only
 		#mosfile.write("simulate(" + mdl.GetModelicaClassString() + ", startTime = " + str(0) + ", stopTime = " + str(1) + ", method = \"" + "dassl" + "\", outputFormat=\"mat\");\r\n");
@@ -209,35 +222,9 @@ class OpenModelica(ModelicaTool):
 		this._DeleteFile(mdl.GetName() + "_res.mat");
 		
 		#Rename important files
-		this._RenameFile(mdl.GetName() + Platform.GetExeFileExtension(), mdl.outputDir + os.sep + mdl.outputName + Platform.GetExeFileExtension());
-		this._RenameFile(mdl.GetName() + "_init.xml", mdl.outputDir + os.sep + mdl.outputName + "_init.xml");
-		this._RenameFile(mdl.GetName() + "_info.json", mdl.outputDir + os.sep + mdl.outputName + "_info.json");
-		
-	def CreateSimulation(this, mdl):
-		from PySimLib.Simulation import Simulation;
-		from PySimLib import FindSolver;
-		
-		initDom = this.__GetInitFileXML(mdl);
-		mv = initDom.getElementsByTagName("ModelVariables")[0];
-		de = initDom.getElementsByTagName("DefaultExperiment")[0];
-		
-		sim = Simulation(mdl);
-			
-		#read experiment values
-		sim.startTime = de.getAttribute("startTime");
-		sim.stopTime = de.getAttribute("stopTime");
-		sim.solver = FindSolver(de.getAttribute("solver"));
-		sim.solver.stepSize = float(de.getAttribute("stepSize"));
-		sim.solver.tolerance = float(de.getAttribute("tolerance"));
-		
-		#read variables			
-		classTypeFilter = {
-		"rSta" #state variables
-		};
-		
-		sim.vars = this.__ReadVarsFromXML(mv, classTypeFilter);
-		
-		return sim;
+		this._RenameFile(mdl.GetName() + Platform.GetExeFileExtension(), this.__GetExeFilePath(mdl));
+		this._RenameFile(mdl.GetName() + "_init.xml", this.__GetInitFilePath(mdl));
+		this._RenameFile(mdl.GetName() + "_info.json", this.__GetInfoFilePath(mdl));
 		
 	def GetCompatibleSolvers(this):
 		from PySimLib import FindSolver;
@@ -252,12 +239,14 @@ class OpenModelica(ModelicaTool):
 	def GetName(this):
 		return "OpenModelica";
 		
-	def ReadInit(this, mdl):		
-		#read in parameters
+	def ReadInit(this, mdl):
+		from PySimLib import FindSolver;
+		
 		initDom = this.__GetInitFileXML(mdl);
 		mv = initDom.getElementsByTagName("ModelVariables")[0];
+		de = initDom.getElementsByTagName("DefaultExperiment")[0];
 		
-		#read variables			
+		#read parameters			
 		classTypeFilter = {
 			"rPar" #parameters
 		};
@@ -265,21 +254,31 @@ class OpenModelica(ModelicaTool):
 		parameters = this.__ReadVarsFromXML(mv, classTypeFilter);
 		for name in parameters:
 			mdl.parameters[name] = parameters[name].start;
+			
+		#read variables
+		classTypeFilter = {
+			"rSta" #state variables
+		};
+		
+		mdl.variables = this.__ReadVarsFromXML(mv, classTypeFilter);
+		
+		#read experiment values
+		mdl.startTime = de.getAttribute("startTime");
+		mdl.stopTime = de.getAttribute("stopTime");
+		mdl.solver = FindSolver(de.getAttribute("solver"));
+		mdl.solver.stepSize = float(de.getAttribute("stepSize"));
+		mdl.solver.tolerance = float(de.getAttribute("tolerance"));
 		
 	def Simulate(this, sim):
 		from PySimLib.Exceptions.SimulationFailedException import SimulationFailedException;
-		from PySimLib.Exceptions.UncompiledModelException import UncompiledModelException;
 		
 		mdl = sim.GetModel();
 		
 		#paths
-		simInitFilePath = mdl.simDir + os.sep + str(sim.GetSimNumber()) + ".xml";
 		simInfoFilePath = mdl.simDir + os.sep + mdl.GetName() + "_info.json";
-		exePath = mdl.simDir + os.sep + mdl.GetName() + Platform.GetExeFileExtension();
 		
 		#check if model is compiled
-		if(not this._FileExists(exePath)):
-			raise UncompiledModelException(mdl, this);
+		this.__AssertModelCompiled(mdl);
 		
 		#make sure result folder exists
 		if(not this._DirExists(mdl.resultDir)):
@@ -289,26 +288,27 @@ class OpenModelica(ModelicaTool):
 		this.__WriteInit(sim);
 		
 		#info file can't be specified as arg to openmodelica
-		if(not(mdl.outputName == mdl.GetName())):
-			shutil.copyfile(mdl.simDir + os.sep + mdl.outputName + "_info.json", simInfoFilePath);
+		if(not(mdl.outputName == mdl.GetName()) or not(mdl.simDir == mdl.outputDir)):
+			shutil.copyfile(this.__GetInfoFilePath(mdl), simInfoFilePath);
 			
 		#run compiled model		
 		simArgs = [
-			exePath,
+			this.__GetExeFilePath(mdl),
 			"-f",
-			simInitFilePath,
-		];		
-		exitCode = Platform.Execute(simArgs);
+			this.__GetSimInitFilePath(sim),
+		];
+		
+		exitCode = Platform.Execute(simArgs, True, mdl.simDir);
 		if(not(exitCode == 0)):
 			raise SimulationFailedException(sim, this);
 		
 		#keep things clean
-		if(not(mdl.outputName == mdl.GetName())):
+		if(not(mdl.outputName == mdl.GetName()) or not(mdl.simDir == mdl.outputDir)):
 			this._DeleteFile(simInfoFilePath);
-		this._DeleteFile(simInitFilePath);
+		this._DeleteFile(this.__GetSimInitFilePath(sim));
 		
 		#rename results
-		this._RenameFile(mdl.GetName() + "_res.mat", mdl.resultDir + os.sep + mdl.outputName + "_res.mat");
+		this._RenameFile(mdl.simDir + os.sep + mdl.GetName() + "_res.mat", this._GetSimResultFilePath(sim));
 		
 	#Class functions
 	def IsAvailable():		
