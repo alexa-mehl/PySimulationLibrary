@@ -3,14 +3,17 @@ class Simulation:
 	__simCounter = 0
 	
 	#Constructor
-	def __init__(this, mdl):
+	def __init__(this, mdl, simNumber = None):
 		import copy;
+		
+		if(simNumber is None):
+			simNumber = Simulation.__simCounter;
+			
+			Simulation.__simCounter += 1;
 		
 		#Private members
 		this.__mdl = mdl;
-		this.__simNumber = Simulation.__simCounter;
-		
-		Simulation.__simCounter += 1;
+		this.__simNumber = simNumber;
 		
 		#Public members
 		this.startTime = mdl.startTime;

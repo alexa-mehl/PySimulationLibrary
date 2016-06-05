@@ -23,6 +23,7 @@ class ModelicaTool(Tool):
 		
 	def ReadResult(this, sim):
 		from PySimLib.Mat.Mat import Mat;
+		from PySimLib.SimulationResult import SimulationResult;
 		
 		mdl = sim.GetModel();
 		
@@ -57,5 +58,12 @@ class ModelicaTool(Tool):
 				result["time"] = currentVar;
 			else:
 				result[names.GetString(i)] = currentVar;
-			
-		return result;
+				
+		#set final values
+		for key in result:
+			if(key in sim.variables):
+				f = result[key][-1];
+				sim.variables[key].final = f;
+				mdl.variables[key].final = f;
+				
+		return SimulationResult(result);

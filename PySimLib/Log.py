@@ -12,6 +12,10 @@ def Append(string):
 	
 	__target.write(string);
 	
+def Line(string):
+	Append(string);
+	Append("\r\n");
+	
 def SetTarget(target):
 	global __target;
 	

@@ -20,8 +20,8 @@ class OpenModelica(ModelicaTool):
 		store = False;
 		
 		varName = var.getAttribute("name");
-		if(var.getAttribute("isValueChangeable") == "false"):
-			return None;
+		#if(var.getAttribute("isValueChangeable") == "false"):
+			#return None;
 		
 		for node in var.childNodes: #find the value
 			if(node.nodeType == xml.dom.Node.ELEMENT_NODE):					
@@ -209,6 +209,7 @@ class OpenModelica(ModelicaTool):
 		this._DeleteFile(mdl.GetName() + "_14lnz.o");
 		this._DeleteFile(mdl.GetName() + "_15syn.c");
 		this._DeleteFile(mdl.GetName() + "_15syn.o");
+		this._DeleteFile(mdl.GetName() + "_16dae.h");
 		this._DeleteFile(mdl.GetName() + "_16dae.c");
 		this._DeleteFile(mdl.GetName() + "_16dae.o");
 		this._DeleteFile(mdl.GetName() + "_functions.c");
@@ -257,7 +258,8 @@ class OpenModelica(ModelicaTool):
 			
 		#read variables
 		classTypeFilter = {
-			"rSta" #state variables
+			"rSta", #state variables
+			"iAlg" #integer algebraic
 		};
 		
 		mdl.variables = this.__ReadVarsFromXML(mv, classTypeFilter);
