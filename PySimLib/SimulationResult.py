@@ -19,6 +19,10 @@ class SimulationResult:
 	def __init__(this, values):
 		this.__values = values;
 		
+	#Magic methods
+	def __getitem__(this, key):
+		return this.__values[key];
+		
 	#Public methods
 	#Returns a datapoint of a trace of a variable
 	#

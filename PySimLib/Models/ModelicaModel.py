@@ -12,6 +12,7 @@ class ModelicaModel(Model):
 		
 		#Public members
 		this.parameters = {};
+		this.variables = {};
 		
 	#Magic methods
 	def __str__(this):
@@ -21,13 +22,24 @@ class ModelicaModel(Model):
 	def GetFiles(this):
 		return this.__files;
 
-	def GetModelicaClassString(this):
+	def GetModelicaClassString(this, includeVariables = False, source = None):
 		cmd = this.GetName();
 		
-		if(this.parameters):
+		def numericSafe(x):
+			if(type(x) == float and x.is_integer()):
+				return int(x);
+			return x;
+		
+		if(source is None):
+			source = this;
+		
+		if(this.parameters or source.variables):
 			cmd = cmd + "(";
 			for key in this.parameters:
 				cmd = cmd + key + "=" + str(this.parameters[key]) + ",";
+			for key in source.variables:
+				if(not (source.variables[key].start is None)):
+					cmd += key + "(start=" + str(numericSafe(source.variables[key].start)) + "),";
 			cmd = cmd[:-1]; #remove last comma
 			cmd = cmd + ")";
 			

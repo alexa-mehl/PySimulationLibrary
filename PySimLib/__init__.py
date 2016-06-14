@@ -45,6 +45,10 @@ def __RegisterSolvers():
 	#from PySimLib.Solvers.Euler import Euler;
 	#__g_solvers[Euler()] = Euler;
 	
+	#LSODAR
+	from PySimLib.Solvers.LSODAR import LSODAR;
+	__g_solvers[LSODAR()] = LSODAR;
+	
 Model = None;
 
 __RegisterTools();

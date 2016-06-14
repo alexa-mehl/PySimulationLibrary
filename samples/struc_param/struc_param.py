@@ -3,13 +3,15 @@ from PySimLib import *;
 Log.SetTarget(open("sim.log", "w"));
 
 mdl = Model("struc_param", "struc_param.mo");
-mdl.outputDir += "/result";
+mdl.outputDir += "/output";
+mdl.resultDir += "/result";
 mdl.parameters["N"] = 2;
 
 tool = mdl.GetCompatibleTools()[0];
 tool.Compile(mdl);
+tool.ReadInit(mdl);
 
-sim = tool.CreateSimulation(mdl);
+sim = Simulation(mdl);
 sim.stopTime = 10;
 tool.Simulate(sim);
 
