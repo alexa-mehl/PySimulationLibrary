@@ -249,7 +249,8 @@ class OpenModelica(ModelicaTool):
 		
 		#read parameters			
 		classTypeFilter = {
-			"rPar" #parameters
+			"iPar", #integer parameter
+			"rPar", #real parameter
 		};
 		
 		parameters = this.__ReadVarsFromXML(mv, classTypeFilter);
@@ -258,8 +259,8 @@ class OpenModelica(ModelicaTool):
 			
 		#read variables
 		classTypeFilter = {
+			"iAlg", #integer algebraic
 			"rSta", #state variables
-			"iAlg" #integer algebraic
 		};
 		
 		mdl.variables = this.__ReadVarsFromXML(mv, classTypeFilter);
