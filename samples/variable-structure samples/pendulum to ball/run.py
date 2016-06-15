@@ -7,12 +7,20 @@ Log.SetTarget(open("sim.log", "w"));
 pendulum = Model("pendulum", "pendulum.mo");
 ball = Model("ball", "ball.mo");
 
+pendulum.outputDir += "/output";
+pendulum.resultDir += "/result";
+ball.outputDir += "/output";
+ball.resultDir += "/result";
+
 tool = pendulum.GetCompatibleTools()[0];
 tool.Compile(pendulum);
 tool.Compile(ball);
+tool.ReadInit(pendulum);
+tool.ReadInit(ball);
 
 #simulate pendulum until we find a force less than zero
-sim = tool.CreateSimulation(pendulum);
+sim = Simulation(pendulum);
+sim.stopTime = 1;
 
 derPhi = 0;
 index = None;
@@ -20,7 +28,7 @@ index = None;
 while index is None:
 	derPhi += 1;
 	
-	sim.vars["derPhi"].start = derPhi;
+	sim.variables["derPhi"].start = derPhi;
 	tool.Simulate(sim);
 	result = tool.ReadResult(sim);
 	
@@ -42,13 +50,13 @@ for i in range(0, index):
 			
 
 #run ball sim
-sim = tool.CreateSimulation(ball);
+sim = Simulation(ball);
 
 sim.stopTime = 0.6;
-sim.vars["x"].start = sin(result["phi"][index]);
-sim.vars["y"].start = -cos(result["phi"][index]);
-sim.vars["vx"].start = cos(result["phi"][index]) * result["derPhi"][index] * pendulum.parameters["L"];
-sim.vars["vy"].start = sin(result["phi"][index]) * result["derPhi"][index] * pendulum.parameters["L"];
+sim.variables["x"].start = sin(result["phi"][index]);
+sim.variables["y"].start = -cos(result["phi"][index]);
+sim.variables["vx"].start = cos(result["phi"][index]) * result["derPhi"][index] * pendulum.parameters["L"];
+sim.variables["vy"].start = sin(result["phi"][index]) * result["derPhi"][index] * pendulum.parameters["L"];
 
 tool.Simulate(sim);
 result2 = tool.ReadResult(sim);
@@ -57,7 +65,7 @@ result2 = tool.ReadResult(sim);
 p = Plot();
 p.Add(x, y, "r");
 p.Add(result2["x"], result2["y"], "b");
-p.Save("pendulumToBall.png");
+p.Save(pendulum.outputDir + "/pendulumToBall.png");
 
 
 tool.Close();

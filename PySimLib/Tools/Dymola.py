@@ -12,7 +12,8 @@ class Dymola(ModelicaTool):
 	__openFiles = {};
 	
 	__solverMap = {
-		'deabm' : 0,
+		'deabm' : 1,
+		'lsodar' : 4,
 		'dassl' : 8
 		#TODO THE REST
 	};
@@ -24,6 +25,17 @@ class Dymola(ModelicaTool):
 		#check if model is compiled
 		if(not this._FileExists(this.__GetExeFilePath(mdl))):
 			raise UncompiledModelException(mdl, this);
+			
+	def __DeleteUnnecessaryFiles(this):
+		this._DeleteFile("alistlog.txt");
+		this._DeleteFile("buildlog.txt");
+		this._DeleteFile("dsfinal.txt");
+		this._DeleteFile("dsin.txt");
+		this._DeleteFile("dslog.txt");
+		this._DeleteFile("dsmodel.c");
+		this._DeleteFile("dymosim.exe");
+		this._DeleteFile("dymosim.exp");
+		this._DeleteFile("dymosim.lib");
 			
 	def __EnsureDymolaIsOpen(this):
 		if(not Dymola.__dymolaIsOpen):
@@ -45,10 +57,10 @@ class Dymola(ModelicaTool):
 	def __GetExeFilePath(this, mdl):
 		from PySimLib import Platform;
 		
-		return mdl.simDir + os.sep + mdl.outputName + Platform.GetExeFileExtension();
+		return mdl.outputDir + os.sep + mdl.outputName + Platform.GetExeFileExtension();
 			
 	def __GetInitFilePath(this, mdl):
-		return mdl.simDir + os.sep + mdl.outputName + "_in.mat";
+		return mdl.outputDir + os.sep + mdl.outputName + "_in.mat";
 		
 	def __GetSimInitFilePath(this, sim):
 		mdl = sim.GetModel();
@@ -62,10 +74,10 @@ class Dymola(ModelicaTool):
 		raise Exception("Illegal solver '" + str(solverNumber) + "'");
 			
 	def __OpenFile(this, mdl, fileName):
-		path = mdl.simDir + '/' + fileName;
+		path = mdl.simDir + os.sep + fileName;
+		path = path.replace('\\', '/');
 		
 		if(path not in Dymola.__openFiles):
-			path = path.replace('\\', '/');
 			Dymola.__ddeConversation.Exec("openModel(\"" + path + "\")");
 			Dymola.__openFiles[path] = True;
 			
@@ -94,6 +106,7 @@ class Dymola(ModelicaTool):
 		
 	def __WriteInit(this, sim):
 		from PySimLib.Mat.OutputStream import OutputStream;
+		from PySimLib.Mat.MatrixTypeEvaluator import TYPE_INT32;
 		
 		mdl = sim.GetModel();
 		
@@ -113,29 +126,42 @@ class Dymola(ModelicaTool):
 		values = mat.GetMatrix("initialValue");
 		for i in range(0, names.GetNumberOfStrings()):
 			name = names.GetString(i);
-			if(name in sim.vars):
+			
+			if(name not in sim.variables):
+				continue;
+				
+			if(sim.variables[name].start is None):
 				value = sim.vars[name].start;
 				values.SetValue(1, i, value);
 		
 		#write output		
 		file = open(this.__GetSimInitFilePath(sim), "wb");
 		stream = OutputStream(file);
-		mat.Write(stream);
+		#mat.Write(stream);
 		
-		#we need to write the matrices in the exact order or dymola can't read the file
-		#outMat.GetMatrix("Aclass").Write("Aclass", stream);
-		#outMat.GetMatrix("experiment").Write("experiment", stream);
-		#outMat.GetMatrix("method").Write("method", stream);
-		#outMat.GetMatrix("settings").Write("settings", stream);
-		#outMat.GetMatrix("initialName").Write("initialName", stream);
-		#outMat.GetMatrix("initialValue").Write("initialValue", stream);
-		#outMat.GetMatrix("initialDescription").Write("initialDescription", stream);
+		#we need to set precision values for the matrices or dymola wont accept the input
+		settings = mat.GetMatrix("settings");
+		
+		settings.SetDesiredOutputPrecision(TYPE_INT32);
+
+		mat.GetMatrix("initialDescription").SetString(0, "Dymola");
+		
+		#we need to write the matrices in the exact order or dymola can't read the file		
+		mat.GetMatrix("Aclass").Write("Aclass", stream);
+		mat.GetMatrix("experiment").Write("experiment", stream);
+		mat.GetMatrix("method").Write("method", stream);
+		settings.Write("settings", stream);
+		mat.GetMatrix("initialName").Write("initialName", stream);
+		mat.GetMatrix("initialValue").Write("initialValue", stream);
+		mat.GetMatrix("initialDescription").Write("initialDescription", stream);
 		
 		file.close();
 			
 	#Public methods
 	def Close(this):
-		Dymola.__ddeConversation.Exec("exit();");
+		if(Dymola.__ddeConversation is not None):
+			Dymola.__ddeConversation.Exec("exit();");
+			Dymola.__ddeConversation = None;
 		
 	def Compile(this, mdl):
 		from PySimLib import Platform;
@@ -150,118 +176,121 @@ class Dymola(ModelicaTool):
 		Dymola.__ddeConversation.Exec("cd(\"" + mdl.simDir.replace('\\', '/') + "\")");
 		
 		#simulate to run model
-		Dymola.__ddeConversation.Exec("simulateModel(\"" + mdl.GetModelicaClassString() + "\", stopTime=0)"); #method=\"" + this.solver.name + "\"
+		Dymola.__ddeConversation.Exec("translateModel(\"" + mdl.GetModelicaClassString() + "\")");
+		#Dymola.__ddeConversation.Exec("simulateModel(\"" + mdl.GetModelicaClassString() + "\", stopTime=0)"); #method=\"" + this.solver.name + "\"
 		
-		#Delete unnecessary files
-		this._DeleteFile("buildlog.txt");
-		this._DeleteFile("dsfinal.txt");
-		this._DeleteFile("dslog.txt");
-		this._DeleteFile("dsmodel.c");
-		this._DeleteFile("dsres.mat");
-		this._DeleteFile("dymosim.exp");
-		this._DeleteFile("dymosim.lib");
+		this._EnsureOutputFolderExists(mdl);
 		
 		#Convert the dsin
 		args = [
 			GetConfigValue("Dymola", "PathAlist"),
 			"-b",
 			mdl.simDir + os.sep + "dsin.txt",
-			mdl.simDir + os.sep + mdl.outputName + "_in.mat"
+			this.__GetInitFilePath(mdl)
 		];
 		Platform.Execute(args);
 		
-		this._DeleteFile("alistlog.txt");
-		this._DeleteFile("dsin.txt");
+		#this._DeleteFile("dsres.mat");
 		
 		#Rename important files
-		this._RenameFile("dymosim" + Platform.GetExeFileExtension(), mdl.outputName + Platform.GetExeFileExtension());
+		this._RenameFile("dymosim" + Platform.GetExeFileExtension(), this.__GetExeFilePath(mdl));
 		
-	def CreateSimulation(this, mdl):
-		from PySimLib.Simulation import Simulation;
-		
-		this.__CheckIfModelIsCompiled(mdl);
-			
-		sim = Simulation(mdl);
-			
-		initMat = Mat();
-		initMat.Load(this.__GetInitFilePath(mdl));
-			
-		#read experiment values
-		experiment = initMat.GetMatrix("experiment");
-		sim.startTime = experiment.GetValue(0, 0);
-		sim.stopTime = experiment.GetValue(0, 1);
-		sim.solver = this.__ReverseMapSolver(experiment.GetValue(0, 6));
-		#sim.solver.stepSize = TODO: ???
-		sim.solver.tolerance = experiment.GetValue(0, 4);
-		
-		#read variables			
-		varTypeFilter = {
-			1, #parameters
-			2, #state variable
-		};
-		
-		sim.vars = this.__ReadVarsFromMat(initMat.GetMatrix("initialName"), initMat.GetMatrix("initialValue"), varTypeFilter);
-		
-		return sim;
+		this.__DeleteUnnecessaryFiles();
 		
 	def GetCompatibleSolvers(this):
 		from PySimLib import FindSolver;
 		
 		solvers = [];
 		
-		solvers.append(FindSolver("dassl"));
+		for key in Dymola.__solverMap:
+			solvers.append(FindSolver(key));
 		
 		return solvers;
 		
 	def GetName(this):
 		return "Dymola";
 		
+	def ReadInit(this, mdl):		
+		this.__CheckIfModelIsCompiled(mdl);
+		
+		initMat = Mat();
+		initMat.Load(this.__GetInitFilePath(mdl));
+		
+		#read parameters
+		varTypeFilter = {
+			1, #parameters
+		};
+		
+		parameters = this.__ReadVarsFromMat(initMat.GetMatrix("initialName"), initMat.GetMatrix("initialValue"), varTypeFilter);
+		for name in parameters:
+			mdl.parameters[name] = parameters[name].start;
+			
+		#read variables
+		varTypeFilter = {
+			2, #state variable
+			6, #auxiliary variable
+		};
+		
+		mdl.variables = this.__ReadVarsFromMat(initMat.GetMatrix("initialName"), initMat.GetMatrix("initialValue"), varTypeFilter);
+			
+		#read experiment values
+		experiment = initMat.GetMatrix("experiment");
+		mdl.startTime = experiment.GetValue(0, 0);
+		mdl.stopTime = experiment.GetValue(0, 1);
+		mdl.solver = this.__ReverseMapSolver(experiment.GetValue(0, 6));
+		#sim.solver.stepSize = TODO: ???
+		mdl.solver.tolerance = experiment.GetValue(0, 4);
+		
 	def Simulate(this, sim):
 		mdl = sim.GetModel();
+		
+		#paths
+		dsinPaths = mdl.simDir + os.sep + "dsin.txt";
 		
 		#error checks
 		this.__CheckIfModelIsCompiled(mdl);
 		
-		#make sure result folder exists
-		if(not this._DirExists(mdl.outputDir)):
-			os.makedirs(mdl.outputDir);
+		this._EnsureResultFolderExists(mdl);
 			
-		#prepare init file		
+		#prepare init file
 		this.__WriteInit(sim);
 		
 		#simulate
 		if(GetBoolConfigValue("Dymola", "SimByExe")):
 			args = [this.__GetExeFilePath(mdl), this.__GetSimInitFilePath(sim)];
-			Platform.Execute(args);
+			Platform.Execute(args, True, mdl.simDir);
 		else:
-			#TODO: Load simconfig
 			from PySimLib import Log, Platform;
 			#convert back to dsin
 			args = [
 				GetConfigValue("Dymola", "PathAlist"),
 				"-a",
 				this.__GetSimInitFilePath(sim),
-				mdl.simDir + os.sep + "dsin.txt",
+				dsinPaths
 			];
-			Platform.Execute(args);
+			#Platform.Execute(args);
+			
+			#load simulation config --- apparently not working like this
+			#Dymola.__ddeConversation.Exec("importInitial(\"" + this.__GetSimInitFilePath(sim).replace('\\', '/') + "\")");
 			
 			#run
 			this.__EnsureDymolaIsOpen();
-			Dymola.__ddeConversation.Exec("simulateModel(\"" + mdl.GetModelicaClassString() + "\")");
+			Dymola.__ddeConversation.Exec("simulateModel(\"" + mdl.GetModelicaClassString(True, sim) + "\", startTime=" + str(sim.startTime) + ", stopTime=" + str(sim.stopTime) + ", method=\"" + str(sim.solver.GetName()) + "\", tolerance=" + str(sim.solver.tolerance) + ")");
+			
+			#we always need to close the model, so that dymola recompiles it			
+			Dymola.__ddeConversation.Exec("closeModel();");
 			
 			#delete dsin
-			this._DeleteFile(mdl.simDir + os.sep + "dsin.txt");
+			this._DeleteFile(dsinPaths);
 			
 		failed = False;		
 		if(this._FileExists("failure")):
 			failed = True;
 		
 		#keep things clean
-		this._DeleteFile("dsfinal.txt");
-		this._DeleteFile("dslog.txt");
-		this._DeleteFile("status");
-		this._DeleteFile("success");
-		this._DeleteFile("failure");
+		#this._DeleteFile("status");
+		#this._DeleteFile("success");
+		#this._DeleteFile("failure");
 		
 		if(failed):
 			this._DeleteFile("dsres.mat");
@@ -270,7 +299,9 @@ class Dymola(ModelicaTool):
 		this._DeleteFile(this.__GetSimInitFilePath(sim));
 		
 		#rename results
-		this._RenameFile(mdl.simDir + os.sep + "dsres.mat", mdl.outputDir + os.sep + mdl.outputName + "_res.mat");
+		this._RenameFile(mdl.simDir + os.sep + "dsres.mat", this._GetSimResultFilePath(sim));
+		
+		this.__DeleteUnnecessaryFiles();
 		
 	#Class functions
 	def IsAvailable():
