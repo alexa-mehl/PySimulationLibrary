@@ -1,0 +1,10 @@
+1. Please install Python 3. We tested the library with Python 3.5, earlier versions might work but we are not sure about that.
+   A default installation will be fine. If you're using advanced options, be sure that you install Python with "pip", the package manager of Python and TCL/tk for UI.
+   We also recommend that you check the option that Pythons' directory is added to the PATH environment variable. If you do so you can run python from any directory. Else you have to specify always the path to Pythons' installation directory whenever running a Python program.
+   
+2. Now the depencies have to be installed. The easiest way is to use pip for that. Installing a package is simple as executing the command "pip install somePackage" from command-line.
+   We will list the module names for pip here line per line. Simply execute the just mentioned command for each of the packages. In case you're not using pip you can also find the packages online as archive files.
+   The required packages are:
+   matplotlib
+   
+3. Install a simulator. We are currently supporting MATLAB/Simulink, OpenModelica and Dymola (currently only Windows).
