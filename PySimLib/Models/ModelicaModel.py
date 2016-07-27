@@ -1,4 +1,6 @@
+#Lib
 import os;
+import os.path;
 
 from PySimLib.Model import Model;
 
@@ -47,4 +49,6 @@ class ModelicaModel(Model):
 		
 	#Class functions
 	def Matches(name, files):
-		return True;
+		extension = os.path.splitext(files[0])[1];
+		
+		return extension == ".mo";

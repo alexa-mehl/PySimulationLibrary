@@ -59,11 +59,6 @@ class ModelicaTool(Tool):
 			else:
 				result[names.GetString(i)] = currentVar;
 				
-		#set final values
-		for key in result:
-			if(key in sim.variables):
-				f = result[key][-1];
-				sim.variables[key].final = f;
-				mdl.variables[key].final = f;
+		this._SetDerivedValuesFromSimulationResults(sim, result);
 				
 		return SimulationResult(result);

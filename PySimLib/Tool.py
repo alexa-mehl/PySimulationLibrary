@@ -32,6 +32,16 @@ class Tool:
 		if(not (os.path.abspath(fromName) == os.path.abspath(toName))):
 			this._DeleteFile(toName);
 			os.rename(fromName, toName);
+			
+	def _SetDerivedValuesFromSimulationResults(this, sim, resultDict):
+		mdl = sim.GetModel();
+		
+		#set final values
+		for key in resultDict:
+			if(key in sim.variables):
+				f = resultDict[key][-1];
+				sim.variables[key].final = f;
+				mdl.variables[key].final = f;
 		
 	#Abstract
 	def Accepts(this, mdl):

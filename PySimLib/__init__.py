@@ -15,13 +15,17 @@ def __RegisterTool(toolClass):
 		__g_tools.append(toolClass());
 
 def __RegisterTools():
+	#Dymola
+	from PySimLib.Tools.Dymola import Dymola;
+	__RegisterTool(Dymola);
+	
 	#OpenModelica
 	from PySimLib.Tools.OpenModelica import OpenModelica;
 	__RegisterTool(OpenModelica);
 	
-	#Dymola
-	from PySimLib.Tools.Dymola import Dymola;
-	__RegisterTool(Dymola);
+	#Simulink
+	from PySimLib.Tools.Simulink import Simulink;
+	__RegisterTool(Simulink);
 	
 def __RegisterModelRepresentationClasses():
 	global __g_modelClasses;
@@ -29,6 +33,10 @@ def __RegisterModelRepresentationClasses():
 	#Modelica
 	from PySimLib.Models.ModelicaModel import ModelicaModel;
 	__g_modelClasses.append(ModelicaModel);
+	
+	#Simulink
+	from PySimLib.Models.SimulinkModel import SimulinkModel;
+	__g_modelClasses.append(SimulinkModel);
 	
 def __RegisterSolvers():
 	global __g_solvers;
@@ -81,7 +89,7 @@ def FindSolver(pattern):
 def FindTool(pattern):
 	tools = GetTools();
 	
-	pattern = pattern.lower();	
+	pattern = pattern.lower();
 	for tool in tools:
 		if(tool.GetName().lower() == pattern):
 			return tool;
