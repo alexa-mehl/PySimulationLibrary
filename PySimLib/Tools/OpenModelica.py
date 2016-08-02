@@ -53,6 +53,8 @@ class OpenModelica(ModelicaTool):
 					start = node.getAttribute("start");
 					if(start == ""):
 						varDesc.start = 0;
+					elif(start == "true"):
+						varDesc.start = True;
 					else:
 						varDesc.start = float(start);
 				else:
@@ -281,7 +283,9 @@ class OpenModelica(ModelicaTool):
 			
 		#read variables
 		classTypeFilter = {
+			"bAlg", #boolean algebraic
 			"iAlg", #integer algebraic
+			"rAlg", #real algebraic
 			"rSta", #state variables
 		};
 		
