@@ -33,6 +33,7 @@ setup(
     license = "GPL",
     
     install_requires = [
-        "matplotlib"
+        "matplotlib",
+        "pymatbridge"
     ],
 )

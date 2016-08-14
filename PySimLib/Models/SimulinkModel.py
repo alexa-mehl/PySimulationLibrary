@@ -32,6 +32,10 @@ class SimulinkModel(Model):
 		#Private members		
 		this.__file = files[0];
 		
+	#Magic methods
+	def __str__(this):
+		return "SimulinkModel(" + this.GetName() + ")";
+		
 	#Public methods
 	def GetFile(this):
 		return this.__file;

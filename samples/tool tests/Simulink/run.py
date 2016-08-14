@@ -13,6 +13,9 @@ if(tool is None):
 tool.Compile(mdl);
 tool.ReadInit(mdl);
 
+print(mdl.variables);
+exit();
+
 sim = Simulation(mdl);
 tool.Simulate(sim);
 result = tool.ReadResult(sim);

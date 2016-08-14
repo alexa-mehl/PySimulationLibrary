@@ -68,14 +68,31 @@ class Simulink(Tool):
 		return "Simulink";
 		
 	def ReadInit(this, mdl):
+		from PySimLib import FindSolver;
+		
+		this.__EnsureMatlabConnectionIsSetup();
+		
+		cmd = "clear;"; #make sure workspace is clean
+		cmd += "cd " + mdl.simDir + ";"; #go to sim dir
+		Simulink.__matlabConnection.run_code(cmd);
+		
+		#exec init file
+		if(this._FileExists(mdl.simDir + os.sep + mdl.GetName() + "_init.m")):
+			Simulink.__matlabConnection.run_code(mdl.GetName() + "_init;");
+			
+		#get all variables
+		varList = Simulink.__matlabConnection.get_variable('who');
+		print(varList);
+		for x in varList:
+			data = Simulink.__matlabConnection.get_variable(x[0][0]);
+			if(not(data is None)):
+				print(x[0][0], data);
+		
 		#TODO: read init file into matlab, read back variables in workspace -> variables
-		#TODO
 		mdl.startTime = None;
 		mdl.stopTime = None;
 		mdl.variables = {};
-		from PySimLib import FindSolver;
-		mdl.solver = FindSolver("dassl");
-		pass #hm...
+		mdl.solver = FindSolver("dassl"); #TODO!!!!
 		
 	def ReadResult(this, sim):
 		from PySimLib.SimulationResult import SimulationResult;
