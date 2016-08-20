@@ -55,6 +55,8 @@ class OpenModelica(ModelicaTool):
 						varDesc.start = 0;
 					elif(start == "true"):
 						varDesc.start = True;
+					elif(start == "false"):
+						varDesc.start = False;
 					else:
 						varDesc.start = float(start);
 				else:
