@@ -36,7 +36,6 @@ class ModelicaModel(Model):
 		
 		#Public members
 		this.parameters = {};
-		this.variables = {};
 		
 	#Magic methods
 	def __str__(this):

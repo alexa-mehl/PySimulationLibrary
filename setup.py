@@ -24,7 +24,7 @@ from setuptools import setup, find_packages;
 
 setup(
     name="PySimLib",
-    version="1.0.0a1",
+    version="1.0.0b1",
     description="The Python Simulation Library allows to simulate Modelica and Simulink models in a platform-independent way.",
     url = "https://gitlab.tubit.tu-berlin.de/a.mehlhase/PySimulationLibrary",
     author="Alexandra Mehlhase",
@@ -37,3 +37,12 @@ setup(
         "pymatbridge"
     ],
 )
+
+"""
+versioning:
+	1.0.0.dev1 development release
+	1.0.0.a1 alpha release
+	1.0.0.b1 beta release
+	1.0.0.rc1 release candidate
+	1.0.0 final release
+"""

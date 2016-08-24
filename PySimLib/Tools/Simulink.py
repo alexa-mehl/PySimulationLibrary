@@ -69,6 +69,11 @@ class Simulink(Tool):
 		
 	def ReadInit(this, mdl):
 		from PySimLib import FindSolver;
+		from PySimLib.VariableDescriptor import VariableDescriptor;
+		
+		mdl.startTime = None;
+		mdl.stopTime = None;
+		mdl.solver = FindSolver("dassl"); #TODO!!!!
 		
 		this.__EnsureMatlabConnectionIsSetup();
 		
@@ -79,20 +84,17 @@ class Simulink(Tool):
 		#exec init file
 		if(this._FileExists(mdl.simDir + os.sep + mdl.GetName() + "_init.m")):
 			Simulink.__matlabConnection.run_code(mdl.GetName() + "_init;");
-			
+		
 		#get all variables
 		varList = Simulink.__matlabConnection.get_variable('who');
-		print(varList);
 		for x in varList:
-			data = Simulink.__matlabConnection.get_variable(x[0][0]);
-			if(not(data is None)):
-				print(x[0][0], data);
-		
-		#TODO: read init file into matlab, read back variables in workspace -> variables
-		mdl.startTime = None;
-		mdl.stopTime = None;
-		mdl.variables = {};
-		mdl.solver = FindSolver("dassl"); #TODO!!!!
+			name = x[0][0];
+			value = Simulink.__matlabConnection.get_variable(x[0][0]);
+			
+			var = VariableDescriptor();
+			var.start = value;
+			
+			mdl.variables[name] = var;
 		
 	def ReadResult(this, sim):
 		from PySimLib.SimulationResult import SimulationResult;
@@ -132,14 +134,19 @@ class Simulink(Tool):
 		cmd += "cd " + mdl.simDir + ";"; #go to sim dir
 		Simulink.__matlabConnection.run_code(cmd);
 		
-		#run init file
-		if(this._FileExists(mdl.simDir + os.sep + mdl.GetName() + "_init.m")):
-			Simulink.__matlabConnection.run_code(mdl.GetName() + "_init");
-			
-		#TODO: send start and stop time only to simulink if they are not None
+		#send variables
+		cmd = "";
+		for name in mdl.variables:
+			cmd += name + "=" + str(mdl.variables[name].start) + ";";
+		Simulink.__matlabConnection.run_code(cmd);
 			
 		#simulate
-		cmd = "sim " + mdl.GetFile() + ";";
+		cmd = "sim('" + mdl.GetFile() + "'";
+		if(not(mdl.startTime is None)):
+			cmd += ", 'StartTime', " + str(mdl.startTime);
+		if(not(mdl.stopTime is None)):
+			cmd += ", 'StopTime', " + str(mdl.stopTime);
+		cmd += ");";
 		cmd += "logsout.unpack('all');"; #make all variables to top levels
 		cmd += "clear logsout;"; #discard simulation results, as we have direct access to vars now
 		Simulink.__matlabConnection.run_code(cmd);
@@ -147,6 +154,7 @@ class Simulink(Tool):
 		#get all timeserieses
 		outMat = Mat();
 		varList = Simulink.__matlabConnection.get_variable('who');
+		time = None;
 		for x in varList:
 			data = Simulink.__matlabConnection.get_variable(x[0][0] + ".Data");
 			if(not(data is None)):
@@ -154,6 +162,16 @@ class Simulink(Tool):
 				for y in range(0, len(data)):
 					matrix.SetValue(0, y, data[y][0].item());
 					
+				tmp = Simulink.__matlabConnection.get_variable(x[0][0] + ".Time");
+				if((time is None) or (len(tmp) > len(time))):
+					time = tmp;
+					
+		#add time
+		matrix = outMat.AddMatrix('time', 1, len(time));
+		for y in range(0, len(time)):
+			matrix.SetValue(0, y, time[y][0].item());
+			
+		#write mat file					
 		file = open(this.__GetSimResultFilePath(sim), "wb");
 		stream = OutputStream(file);					
 		outMat.Write(stream);

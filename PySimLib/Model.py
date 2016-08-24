@@ -33,6 +33,7 @@ class Model:
 		this.outputDir = None;
 		this.resultDir = None;
 		this.simDir = None;
+		this.variables = {};
 		
 		if(len(files) == 1):
 			this.outputDir = os.path.abspath(os.path.dirname(files[0]));

@@ -92,6 +92,8 @@ def Model(name, files):
 	
 	if(not (type(files) == list)):
 		files = [files];
+	if(not(files)): #if files is empty
+		return None;
 		
 	for mdlClass in __g_modelClasses:
 		if(mdlClass.Matches(name, files)):
