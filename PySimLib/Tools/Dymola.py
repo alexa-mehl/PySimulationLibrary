@@ -279,6 +279,8 @@ class Dymola(ModelicaTool):
 		
 		#simulate
 		if(GetBoolConfigValue("Dymola", "SimByExe")):
+			from PySimLib import Log, Platform;
+			
 			args = [this.__GetExeFilePath(mdl), this.__GetSimInitFilePath(sim)];
 			Platform.Execute(args, True, mdl.simDir);
 		else:
