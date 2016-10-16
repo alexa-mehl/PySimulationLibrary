@@ -1,0 +1,53 @@
+\documentclass[a4paper,12pt,headsepline]{scrartcl}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\usepackage[english]{babel}
+\usepackage{geometry}
+\usepackage{lmodern}
+
+\usepackage{color}
+\usepackage{dtsyntax}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{url}
+
+\geometry{left=2cm, right=2cm, top=2.5cm, bottom=2cm}
+\lstset
+{
+	frame=single,
+	numbers=left,
+	numberstyle=\tiny,
+	numbersep=5pt,
+	keywordstyle=\color{black}\bfseries,
+	stringstyle=\ttfamily,
+	showstringspaces=false,
+	basicstyle=\footnotesize,
+	captionpos=b
+}
+
+\newif\ifshowannotations
+
+\showannotationstrue %Auskommentieren um TODOs zu deaktivieren
+
+%zum schreiben
+\ifshowannotations
+	\newcommand{\TODO}[1]{{\textcolor{green}{\textbf{TODO:}} \textcolor{red}{#1} \\}}
+\else
+	\newcommand{\TODO}[1]{}
+\fi
+
+\begin{document}
+	\include{TitlePage}
+	
+	\tableofcontents
+	\listoftables
+	\listoffigures
+	\lstlistoflistings
+	
+	\include{Introduction}
+	\include{Setup}
+	
+	\TODO{weiter}
+\end{document}

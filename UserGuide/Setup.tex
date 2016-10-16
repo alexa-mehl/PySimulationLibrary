@@ -1,0 +1,89 @@
+\section{Setting up PySimLib}
+
+\subsection{Note on versions}
+
+The following will show you how to set up PySimLib, while mainly focusing on Windows platforms.
+Installation instructions for systems based on Ubuntu are also given.
+Due to the variety of Linux systems we can't provide installation instructions for all of them.
+Unfortunately we currently have no access to a Mac computer and can therefore not provide installation instructions, nor do we know if PySimLib works on Mac.
+We would be pleased to hear feedback on that.
+
+\TODO{python version}
+\TODO{Tabelle unterstützter tools}
+\TODO{Tabelle getesteter tools mit os}
+
+
+
+
+\subsection{Command line}
+
+\TODO{wie man ne command line öffnet}
+
+
+
+
+
+\subsection{Installing Python}
+
+\subsubsection{Windows}
+
+\TODO{bild mit python was angeklickt sein muss}
+
+\subsubsection{Ubuntu}
+Python should already be installed on Ubuntu.
+If not, install it by running the following commands:
+\lstset{language=bash}
+\begin{lstlisting}
+sudo apt-get install python3
+sudo apt-get install python3-pip
+\end{lstlisting}
+If you are unsure whether Python is installed or not, run the commands anyways.
+In case Python is already installed, apt-get is going to inform you and nothing is going to be done.
+
+
+
+
+
+\subsection{Installing a Simulator}
+
+In order to simulate models using the PySimLib you will need a simulator that can simulate your models.
+Note that PySimLib is not a simulator itself but can communicate with several ones and provides a common interface to do so.
+Please follow the manual of the simulator of your choice in order to set it up correctly.
+Be sure that it is working properly before continuing with PySimLib.
+Again, the supported simulators are mentioned in Table \ref{supportedSimulators}.
+
+You can install (or remove) additional simulators any time but whenever you do that, you have to reconfigure PySimLib.
+See subsection \ref{configuringPySimLib} for configuring PySimLib.
+
+
+
+
+
+\subsection{Installing PySimLib}
+
+PySimLib can be installed very simply using pip.
+In order to determine the correct pip version try entering the following commands:
+\lstset{language=bash}
+\begin{lstlisting}
+pip3.5
+pip3
+pip
+\end{lstlisting}
+
+Remember the first one that worked and take it for all following commands where "pipxyz" is used.
+\\
+To install PySimLib execute the following commands (\textbf{you might need advanced privileges}):
+\begin{lstlisting}
+pipxyz install zmq
+pipxyz install PySimLib
+\end{lstlisting}
+
+
+
+
+
+
+\subsection{Configuring PySimLib}
+\label{configuringPySimLib}
+
+\TODO{schreiben}
