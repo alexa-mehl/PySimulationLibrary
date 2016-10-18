@@ -6,15 +6,119 @@ Due to the variety of Linux systems we can't provide installation instructions f
 Unfortunately we currently have no access to a Mac computer and can therefore not provide installation instructions, nor do we know if PySimLib works on Mac at all.
 We would be pleased to hear feedback on that.
 
-\subsection{Note on versions}
+At first we will give a brief introduction on how to open a command line terminal or console, which will be necessary for the setup process described here.
+The first installation step then will be to install Python, as PySimLib is a Python library.
+In order to simulate models using the PySimLib you will need a simulator that can simulate your models.
+Note that PySimLib is not a simulator itself but can communicate with several ones and provides a common interface to do so.
+The second step of installation will be to install a simulator.
+After these preparations PySimLib can be installed and finally we will describe how to configure PySimLib correctly.
 
+
+
+
+\subsection{Command line}
+
+The command line terminal or console is a program by which the user can issue commands in text-form.
+Interaction is realized in the following way:
+The program writes text to the screen that the user can read.
+The user writes text commands that are confirmed by the \grqq{}Enter\grqq{} or \grqq{}Return\grqq{} keys and are read and executed by the program.
+
+Usually operating systems come with a command line program, in order to control settings, files etc.
+Specific commands may not be executed by any user but by a system administrator, who is allowed to run commands with advanced privileges, such as installing a program or making any other change to the system.
+
+\subsubsection{Windows}
+In Microsoft Windows, the utility cmd.exe is included, also called.
+In order to open it, click the \grqq{}Start\grqq{}-Button or the Windows-Button.
+In the search widget, type \grqq{}cmd\grqq{} without the quotation marks.
+The program \grqq{}Command Prompt\grqq{}, \grqq{}cmd.exe\grqq{} or something similar should appear.
+Click it in order to start it.
+A window similar to that shown in figure \ref{wincmd} should open up.
+In order to run the console in adminstrator mode, repeat the above process but instead of doing a left click, click right and press \grqq{}Run as adminstrator\grqq{}.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/cmd.png}
+	\caption{Windows command prompt under Windows 7 in Administrator mode}
+	\label{wincmd}
+\end{figure}
+
+
+
+\subsection{Unix-like}
+Usually a command line program, usually called Terminal in Unix world, is included with the operating system.
+You should look for it in your program launcher possibly in a category \grqq{}System tools\grqq{} or something close.
+
+You can run a command with advanced privileges by entering the \grqq{}sudo\grqq{} command before it.
+Say you want to run the command \grqq{}help\grqq{} with advanced privileges enter \grqq{}sudo help\grqq{} without quotation marks.
+This might ask you for the password of your operating systems' user account.
+
+
+
+
+
+\subsection{Installing Python}
+
+The first step in setting up PySimLib is installing Python.
 PySimLib was developed for Python 3, in particular version 3.5.
 The library might also work with previous versions of Python 3 but surely not with Python 2.
-By us, PySimLib has only been tested in Python 3.5.
+By us, PySimLib has only been tested in Python 3.5 and we would recommend you to use it.
+In general it is more likely that we will support a newer version than an older one than Python 3.5.
+
+In this guide we will expect users to install apart from Python also \grqq{}pip\grqq{} (this will be shown later).
+Pip is Pythons' package management utility and allows to easily install extensions to Python.
+This is not required, as extensions can be also installed manually but this is rather cumbersome and we don't encourage it.
+In case you don't want to use pip, you can download the mentioned packages and install them manually.
+We will not give support on this process.
+
+
+\subsubsection{Windows}
+
+Go to Pythons' website, download the installer and run it.
+You should see something like in figure \ref{pythonSetup1}.
+You don't need to customize the installation, however we encourage you to check the \grqq{}Add Python 3.5 to PATH\grqq{} box.
+This allows you to execute Python from any directory, which is not necessarily required but makes working with Python easier.
+Don't select this in case you have other versions of Python installed and one of them is added to the PATH environment variable.
+However, in this guide we will expect that the user added Python 3.5 to the PATH variable.
+If you did not do that you have to specify the full path to Python whenever you want to use it.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/python_setup1.png}
+	\caption{Python 3.5 Windows setup}
+	\label{pythonSetup1}
+\end{figure}
+
+
+In case you want to customize the installation, make sure, like in figure \ref{pythonSetup2}, that you select at least \grqq{}pip\grqq{} and \grqq{}tcl/tk and IDLE\grqq{}, which is required by PySimLib in order to draw and show plots.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/python_setup2.png}
+	\caption{Python 3.5 Windows customized setup}
+	\label{pythonSetup2}
+\end{figure}
+
+
+
+
+\subsubsection{Ubuntu}
+Python should already be installed on Ubuntu.
+If not, install it by running the following commands:
+\lstset{language=bash}
+\begin{lstlisting}
+sudo apt-get install python3
+sudo apt-get install python3-pip
+\end{lstlisting}
+If you are unsure whether Python is installed or not, run the commands anyways.
+In case Python is already installed, apt-get is going to inform you and nothing is going to be done.
+
+
+
+
+
+\subsection{Installing a Simulator}
 
 PySimLib currently supports the simulators listed in table \ref{simulatorsList}.
-It should be noted that these simulators exist in different versions, which differentiate in terms of features etc.
-We have listed the constellations of operating system and simulator version under which we tested PySimLib in table \ref{testTable}.
 
 \begin{table}[h]
 	\centering
@@ -28,7 +132,13 @@ We have listed the constellations of operating system and simulator version unde
 	\label{simulatorsList}
 \end{table}
 
-\begin{table}[h]
+Please follow the manual of the simulator of your choice in order to set it up correctly.
+Be sure that it is working properly before continuing with installing PySimLib.
+
+It should be noted that these simulators exist in different versions, which differentiate in terms of features etc.
+We have listed the constellations of operating system and simulator version under which we tested PySimLib in table \ref{testTable}.
+
+\begin{table}[H]
 	\centering
 	\begin{tabular}{c | c | c | c | c |}
 		%header
@@ -49,45 +159,7 @@ We have listed the constellations of operating system and simulator version unde
 	\label{testTable}
 \end{table}
 
-
-
-
-\subsection{Command line}
-
-\TODO{wie man ne command line öffnet}
-
-
-
-
-
-\subsection{Installing Python}
-
-\subsubsection{Windows}
-
-\TODO{bild mit python was angeklickt sein muss}
-
-\subsubsection{Ubuntu}
-Python should already be installed on Ubuntu.
-If not, install it by running the following commands:
-\lstset{language=bash}
-\begin{lstlisting}
-sudo apt-get install python3
-sudo apt-get install python3-pip
-\end{lstlisting}
-If you are unsure whether Python is installed or not, run the commands anyways.
-In case Python is already installed, apt-get is going to inform you and nothing is going to be done.
-
-
-
-
-
-\subsection{Installing a Simulator}
-
-In order to simulate models using the PySimLib you will need a simulator that can simulate your models.
-Note that PySimLib is not a simulator itself but can communicate with several ones and provides a common interface to do so.
-Please follow the manual of the simulator of your choice in order to set it up correctly.
-Be sure that it is working properly before continuing with PySimLib.
-Again, the supported simulators are mentioned in Table \ref{supportedSimulators}.
+\textbf{In case you want to use Dymola under Windows you need to install the package \grqq{}pywin32\grqq{} from \url{https://sourceforge.net/projects/pywin32/}.}
 
 You can install (or remove) additional simulators any time but whenever you do that, you have to reconfigure PySimLib.
 See subsection \ref{configuringPySimLib} for configuring PySimLib.
