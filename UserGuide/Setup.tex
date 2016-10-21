@@ -160,6 +160,7 @@ We have listed the constellations of operating system and simulator version unde
 \end{table}
 
 \textbf{In case you want to use Dymola under Windows you need to install the package \grqq{}pywin32\grqq{} from \url{https://sourceforge.net/projects/pywin32/}.}
+PySimLib can also work with a demo version of Dymola but a lot of features will then be unavailable so make sure you have a fully licensed version.
 
 You can install (or remove) additional simulators any time but whenever you do that, you have to reconfigure PySimLib.
 See subsection \ref{configuringPySimLib} for configuring PySimLib.
@@ -195,4 +196,121 @@ pipxyz install PySimLib
 \subsection{Configuring PySimLib}
 \label{configuringPySimLib}
 
-\TODO{schreiben}
+In order to have PySimLib communicating with simulators, it must be told certain info, for example which simulator is installed, where is it installed etc.
+This is realized by using a global configuration file.
+In order to configure PySimLib a normal text editor is sufficient.
+\textbf{Important: Only configure simulators that you have installed on your system!}
+
+The name of the configuration file is \texttt{PySimLib.cfg} (beware of the case on Unix-like systems).
+On Windows systems, the configuration file must be stored in the \texttt{\%LOCALAPPDATA\%} directory, for Unix-like systems under \texttt{~/.config}.
+\texttt{\%LOCALAPPDATA\%} is an environment variable that expands to a specific folder in your user directory, so is \grqq{}~\grqq{} a short cut to the user directory.
+You can use the command line and the \grqq{}echo\grqq{} command in order to expand them to fully qualified paths, like so (similar for Unix-like):
+\lstset{language=bash}
+\begin{lstlisting}
+echo %LOCALAPPDATA%
+\end{lstlisting}
+Note that these folders might be hidden by the file explorer.
+
+\subsubsection{Windows}
+In order to create the configuration file, \textbf{in case you haven't created it already as else this might overwrite your configuration file}, enter in console:
+\lstset{language=bash}
+\begin{lstlisting}
+echo. 2>%LOCALAPPDATA%\PySimLib.cfg
+\end{lstlisting}
+
+To edit the configuration file, type in console:
+\lstset{language=bash}
+\begin{lstlisting}
+notepad %LOCALAPPDATA%\PySimLib.cfg
+\end{lstlisting}
+
+
+
+
+\subsubsection{Unix-like}
+Call your text editor with the configuration file path as argument.
+For instance, when using Ubuntus text editor \grqq{}gedit\grqq{}:
+\lstset{language=bash}
+\begin{lstlisting}
+gedit ~/.config
+\end{lstlisting}
+
+
+
+
+\subsubsection{Configuration file Syntax}
+The configuration file consists of sections and key-value pairs attached to them.
+A section is introduced by a text in squared brackets, for instance \texttt{[Dymola]} for the \grqq{}Dymola\grqq{} section.
+Following the sections are the key-value pairs, the options of the section.
+Both key and value are text and they are separated by an equal-sign.
+Only one key-value pair per line is allowed.
+\textbf{Be aware that the key-value pairs are in general case-sensitive!}
+
+An example of a configuration file with all values for all simulators is shown in listing \ref{configExample}.
+Recap to only configure simulators that are installed and working on your system.
+The meaning of the configuration values are for the specific simulators are explained in the following subsections.
+In general, when asked for a path, the fully qualified path should be preferred, as did in the example for the Dymola and Simulink tools.
+\lstset{language=INI,caption={An example configuration file}, label={configExample}}
+\begin{lstlisting}
+[Dymola]
+PathExe=C:\Program Files (x86)\Dymola 2013 FD01\bin\dymola.exe
+StartupDelay=8
+PathAlist=C:\Program Files (x86)\Dymola 2013 FD01\bin\alist.exe
+SimByExe=true
+
+[OpenModelica]
+PathExe=omc
+
+[Simulink]
+PathExe=/home/amir/MATLAB/R2013a/bin/matlab
+\end{lstlisting}
+
+
+
+
+\subsubsection{Configuration Values for Dymola}
+\begin{table}[H]
+	\centering
+	\begin{tabular}{| l | l | p{10cm} |}
+	\hline
+		\textbf{Configuration key} & \textbf{Value type} & \textbf{Value explanation} \\ \hline
+		
+		PathExe & Path & The path to the Dymola executable or a command in order to run it. \\ \hline
+		
+		StartupDelay & Integer & The duration in seconds that PySimLib should wait for Dymola to start up before trying to communicate with it. This setting is highly dependent on the machine you're running PySimLib on. \\ \hline 
+		
+		PathAlist & Path & The path to the alist executable or a command in order to run it. This utility is shipped with Dymola. \\ \hline
+		
+		SimByExe & $\lbrace$true, false$\rbrace$ & This should in general be set to true. Only set this to false if you're running Dymola with a demo license. Apart from the general drawbacks of Dymolas demo mode, not all features from PySimLib work. Use this if you want to test working with PySimLib and Dymola together. For efficient working with PySimLib in conjuction with Dymola, you should have a license such that you can run the \grqq{}dymosim\grqq{} executables, that Dymola generates for models, outside of Dymola. \\ \hline
+	\end{tabular}
+	\caption{Configuration values for Dymola}
+\end{table}
+
+
+
+
+\subsubsection{Configuration Values for OpenModelica}
+\begin{table}[h]
+	\centering
+	\begin{tabular}{| l | l | p{10cm} |}
+		\hline
+		\textbf{Configuration key} & \textbf{Value type} & \textbf{Value explanation} \\ \hline
+		
+		PathExe & Path & The path to the OpenModelica compiler executable \grqq{}omc\grqq{} or a command in order to run it. \\ \hline
+	\end{tabular}
+	\caption{Configuration values for OpenModelica}
+\end{table}
+
+
+
+\subsubsection{Configuration Values for MATLAB/Simulink}
+\begin{table}[h]
+	\centering
+	\begin{tabular}{| l | l | p{10cm} |}
+		\hline
+		\textbf{Configuration key} & \textbf{Value type} & \textbf{Value explanation} \\ \hline
+		
+		PathExe & Path & The path to the MATLAB executable or a command in order to run it. \\ \hline
+	\end{tabular}
+	\caption{Configuration values for MATLAB/Simulink}
+\end{table}

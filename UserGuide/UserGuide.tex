@@ -5,16 +5,16 @@
 
 \usepackage{amssymb}
 \usepackage[english]{babel}
+\usepackage{color}
 \usepackage{float}
 \usepackage{geometry}
+\usepackage{graphicx}
 \usepackage{lmodern}
 \usepackage{hyperref}
-
-\usepackage{color}
-\usepackage{dtsyntax}
-\usepackage{graphicx}
-\usepackage{listings}
 \usepackage{url}
+
+\usepackage{dtsyntax}
+\usepackage{listings}
 
 \geometry{left=2cm, right=2cm, top=2.5cm, bottom=2cm}
 \lstset
@@ -28,6 +28,20 @@
 	showstringspaces=false,
 	basicstyle=\footnotesize,
 	captionpos=b
+}
+
+%INI language
+\lstdefinelanguage{INI}
+{
+	basicstyle=\ttfamily\small,
+	columns=fullflexible,
+	morecomment=[s][\bfseries]{[}{]},
+	morecomment=[l]{\#},
+	morecomment=[l]{;},
+	commentstyle=\color{gray}\ttfamily,
+	morekeywords={},
+	otherkeywords={=,:},
+	keywordstyle={\color{green}\bfseries}
 }
 
 %Annotations stuff
