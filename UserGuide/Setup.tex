@@ -108,6 +108,7 @@ If not, install it by running the following commands:
 \begin{lstlisting}
 sudo apt-get install python3
 sudo apt-get install python3-pip
+sudo apt-get install python3-tk
 \end{lstlisting}
 If you are unsure whether Python is installed or not, run the commands anyways.
 In case Python is already installed, apt-get is going to inform you and nothing is going to be done.
@@ -185,6 +186,7 @@ Remember the first one that worked and take it for all following commands where 
 To install PySimLib execute the following commands (\textbf{you might need advanced privileges}):
 \begin{lstlisting}
 pipxyz install zmq
+pipxyz install numpy
 pipxyz install PySimLib
 \end{lstlisting}
 
@@ -314,3 +316,13 @@ PathExe=/home/amir/MATLAB/R2013a/bin/matlab
 	\end{tabular}
 	\caption{Configuration values for MATLAB/Simulink}
 \end{table}
+
+
+\subsection{Updating PySimLib}
+You can use Pip again to update PySimLib to its newest version.
+Simply execute the following command to do so:
+\lstset{language=bash,caption={}, label={}}
+\begin{lstlisting}
+pipxyz install --upgrade PySimLib
+\end{lstlisting}
+You may again need advanced privileges.
