@@ -23,6 +23,7 @@
 #Lib
 import os;
 import os.path;
+import re;
 
 from PySimLib.Model import Model;
 
@@ -61,8 +62,12 @@ class ModelicaModel(Model):
 			for key in this.parameters:
 				cmd = cmd + key + "=" + str(this.parameters[key]) + ",";
 			for key in source.variables:
-				if(not (source.variables[key].start is None)):
-					cmd += key + "(start=" + str(numericSafe(source.variables[key].start)) + "),";
+				if(source.variables[key].start is None):
+					continue;
+				if(re.match("der(.+?)", key)): #skip derivatives
+					continue;
+					
+				cmd += key + "(start=" + str(numericSafe(source.variables[key].start)) + "),";
 			cmd = cmd[:-1]; #remove last comma
 			cmd = cmd + ")";
 			

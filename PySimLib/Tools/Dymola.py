@@ -40,6 +40,13 @@ class Dymola(ModelicaTool):
 		#TODO THE REST
 	};
 	
+	#Constructor
+	def __init__(this):
+		ModelicaTool.__init__(this);
+		
+		if(GetBoolConfigValue("Dymola", "SimByExe") == False):
+			print("Warning: You're using Dymola with a reduced feature set. Models may won't be simulated altough they're working directly in Dymola (independent of PySimLib). Please make sure you've read and understood section 2.6.4 of the PySimLib user Guide - specifically the part about the 'SimByExe' flag.");
+	
 	#Private methods
 	def __CheckIfModelIsCompiled(this, mdl):
 		from PySimLib.Exceptions.UncompiledModelException import UncompiledModelException;

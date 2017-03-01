@@ -24,7 +24,7 @@ from setuptools import setup, find_packages;
 
 setup(
     name="PySimLib",
-    version="1.0.0b5",
+    version="1.0.0b6",
     description="The Python Simulation Library allows to simulate Modelica and Simulink models in a platform-independent way.",
     url = "https://gitlab.tubit.tu-berlin.de/a.mehlhase/PySimulationLibrary",
     author="Alexandra Mehlhase",
