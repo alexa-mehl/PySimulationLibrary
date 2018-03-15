@@ -20,49 +20,50 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import struct;
+import struct
+
 
 class OutputStream:
-	#Constructor
-	def __init__(this, target):
-		this.__target = target;
-		
-	#Public methods
-	def WriteASCII(this, str):
-		for x in str:
-			this.WriteByte(x);
-			
-	def WriteByte(this, value):			
-		if(type(value) == float):
-			value = int(value);
-		if(type(value) == str):
-			value = ord(value);
-			
-		this.__target.write(bytes([value]));
-		
-	def WriteFloat32(this, value):
-		s = struct.pack('f', value);
-		this.__target.write(s);
-		
-	def WriteFloat64(this, value):
-		s = struct.pack('d', value);
-		this.__target.write(s);
-		
-	def WriteInt16(this, value):
-		if(type(value) == float):
-			value = int(value);
-		
-		this.WriteByte(value & 0xFF);
-		this.WriteByte((value >> 8) & 0xFF);
-		
-	def WriteInt32(this, value):
-		this.WriteByte(value & 0xFF);
-		this.WriteByte((value >> 8) & 0xFF);
-		this.WriteByte((value >> 16) & 0xFF);
-		this.WriteByte((value >> 24) & 0xFF);
-		
-	def WriteUInt32(this, value):
-		this.WriteByte(value & 0xFF);
-		this.WriteByte((value >> 8) & 0xFF);
-		this.WriteByte((value >> 16) & 0xFF);
-		this.WriteByte((value >> 24) & 0xFF);
+    # Constructor
+    def __init__(this, target):
+        this.__target = target
+
+    # Public methods
+    def WriteASCII(this, str):
+        for x in str:
+            this.WriteByte(x)
+
+    def WriteByte(this, value):
+        if(type(value) == float):
+            value = int(value)
+        if(type(value) == str):
+            value = ord(value)
+
+        this.__target.write(bytes([value]))
+
+    def WriteFloat32(this, value):
+        s = struct.pack('f', value)
+        this.__target.write(s)
+
+    def WriteFloat64(this, value):
+        s = struct.pack('d', value)
+        this.__target.write(s)
+
+    def WriteInt16(this, value):
+        if(type(value) == float):
+            value = int(value)
+
+        this.WriteByte(value & 0xFF)
+        this.WriteByte((value >> 8) & 0xFF)
+
+    def WriteInt32(this, value):
+        this.WriteByte(value & 0xFF)
+        this.WriteByte((value >> 8) & 0xFF)
+        this.WriteByte((value >> 16) & 0xFF)
+        this.WriteByte((value >> 24) & 0xFF)
+
+    def WriteUInt32(this, value):
+        this.WriteByte(value & 0xFF)
+        this.WriteByte((value >> 8) & 0xFF)
+        this.WriteByte((value >> 16) & 0xFF)
+        this.WriteByte((value >> 24) & 0xFF)

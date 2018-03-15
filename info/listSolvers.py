@@ -1,9 +1,9 @@
-from PySimLib import *;
+from PySimLib import *
 
-space = "\t";
+space = "\t"
 
 print("Name", space, "Detailed name")
-print("----");
+print("----")
 
 for solver in GetSolvers():
-	print(solver.GetName(), space, solver.GetDetailedName());
+    print(solver.GetName(), space, solver.GetDetailedName())

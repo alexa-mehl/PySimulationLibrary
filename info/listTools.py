@@ -1,9 +1,9 @@
-from PySimLib import *;
+from PySimLib import *
 
-space = "\t";
+space = "\t"
 
 print("Name")
-print("----");
+print("----")
 
 for tool in GetTools():
-	print(tool.GetName());
+    print(tool.GetName())

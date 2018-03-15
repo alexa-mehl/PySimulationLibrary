@@ -20,21 +20,21 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from setuptools import setup, find_packages;
+from setuptools import setup, find_packages
 
 setup(
     name="PySimLib",
     version="1.0.0b6",
     description="The Python Simulation Library allows to simulate Modelica and Simulink models in a platform-independent way.",
-    url = "https://gitlab.tubit.tu-berlin.de/a.mehlhase/PySimulationLibrary",
+    url="https://gitlab.tubit.tu-berlin.de/a.mehlhase/PySimulationLibrary",
     author="Alexandra Mehlhase",
     author_email="a.mehlhase@tu-berlin.de",
-    packages = ["PySimLib", "PySimLib.Exceptions", "PySimLib.Mat", "PySimLib.Models", "PySimLib.Solvers", "PySimLib.Tools"],
-    license = "GPL",
-    
-    install_requires = [
+    packages=["PySimLib", "PySimLib.Exceptions", "PySimLib.Mat", "PySimLib.Models", "PySimLib.Solvers", "PySimLib.Tools"],
+    license="GPL",
+
+    install_requires=[
         "matplotlib",
-        "pymatbridge" #needs "zmq"
+        "pymatbridge"  # needs "zmq"
     ],
 )
 

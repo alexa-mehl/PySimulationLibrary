@@ -1,12 +1,12 @@
-import sys;
-from PySimLib import *;
+import sys
+from PySimLib import *
 
-tool = FindTool(sys.argv[1]);
+tool = FindTool(sys.argv[1])
 
-print("Name: ", tool.GetName());
+print("Name: ", tool.GetName())
 
-print("Compatible Solvers:");
+print("Compatible Solvers:")
 for solver in tool.GetCompatibleSolvers():
-	print('    ', solver.GetName());
-	
-print("Default Solver: ", tool.GetDefaultSolver().GetName());
+    print('    ', solver.GetName())
+
+print("Default Solver: ", tool.GetDefaultSolver().GetName())
