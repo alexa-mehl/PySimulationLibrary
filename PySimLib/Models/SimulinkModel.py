@@ -20,28 +20,29 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import os;
+import os
 
-from PySimLib.Model import Model;
+from PySimLib.Model import Model
+
 
 class SimulinkModel(Model):
-	#Constructor
-	def __init__(this, name, files):
-		Model.__init__(this, name, files);
-		
-		#Private members		
-		this.__file = files[0];
-		
-	#Magic methods
-	def __str__(this):
-		return "SimulinkModel(" + this.GetName() + ")";
-		
-	#Public methods
-	def GetFile(this):
-		return this.__file;
-		
-	#Class functions
-	def Matches(name, files):
-		extension = os.path.splitext(files[0])[1];
-		
-		return extension == ".mdl";
+    # Constructor
+    def __init__(this, name, files):
+        Model.__init__(this, name, files)
+
+        # Private members
+        this.__file = files[0]
+
+    # Magic methods
+    def __str__(this):
+        return "SimulinkModel(" + this.GetName() + ")"
+
+    # Public methods
+    def GetFile(this):
+        return this.__file
+
+    # Class functions
+    def Matches(name, files):
+        extension = os.path.splitext(files[0])[1]
+
+        return extension == ".mdl"
