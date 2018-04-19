@@ -23,6 +23,7 @@
 #Local
 from PySimLib import Log, Platform;
 from PySimLib.Config import *;
+from PySimLib.Exceptions.SimulationFailedException import SimulationFailedException;
 from PySimLib.Mat.Mat import Mat;
 from PySimLib.Tools.ModelicaTool import ModelicaTool;
 
@@ -159,8 +160,8 @@ class Dymola(ModelicaTool):
 			if(name not in sim.variables):
 				continue;
 				
-			if(sim.variables[name].start is None):
-				value = sim.vars[name].start;
+			if(sim.variables[name].start is not None):
+				value = sim.variables[name].start;
 				values.SetValue(1, i, value);
 		
 		#write output		
@@ -325,7 +326,7 @@ class Dymola(ModelicaTool):
 		
 		if(failed):
 			this._DeleteFile("dsres.mat");
-			raise SimulationFailedException();
+			raise SimulationFailedException(sim, this);
 			
 		this._DeleteFile(this.__GetSimInitFilePath(sim));
 		
