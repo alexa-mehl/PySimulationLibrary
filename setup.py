@@ -1,5 +1,5 @@
 """
-  Copyright (C) 2014-2016  Alexandra Mehlhase <a.mehlhase@tu-berlin.de>, All Rights Reserved
+  Copyright (C) 2014-2018  Alexandra Mehlhase <a.mehlhase@tu-berlin.de>, All Rights Reserved
   
   Implemented by Alexandra Mehlhase, Amir Czwink
   
@@ -24,7 +24,7 @@ from setuptools import setup, find_packages;
 
 setup(
     name="PySimLib",
-    version="1.0.0b6",
+    version="1.0.0b7",
     description="The Python Simulation Library allows to simulate Modelica and Simulink models in a platform-independent way.",
     url = "https://gitlab.tubit.tu-berlin.de/a.mehlhase/PySimulationLibrary",
     author="Alexandra Mehlhase",

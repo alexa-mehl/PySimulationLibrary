@@ -1,3 +1,3 @@
-rm -rf dist
-python3.5 setup.py sdist
+sudo rm -rf dist
+sudo python3 setup.py sdist
 twine upload dist/*
